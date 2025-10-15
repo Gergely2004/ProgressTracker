@@ -1,0 +1,8 @@
+[versions]
+navigation = "2.8.2"
+[libraries]
+# Navigation
+
+androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
+androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
+[plugins]
