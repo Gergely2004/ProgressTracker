@@ -1,8 +1,31 @@
 [versions]
-navigation = "2.8.2"
-[libraries]
-# Navigation
 
+navigation = "2.8.2"
+retrofit = "2.11.0"
+lifecycle = "2.8.4"
+coroutines = "1.8.1"
+legacySupportV4 = "1.0.0"
+fragmentKtx = "1.8.9"
+
+
+[libraries]
+#Retrofit
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref ="retrofit" }
+retrofit-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+
+
+# Lifecycle
+lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycleviewmodel-ktx", version.ref = "lifecycle" }
+lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecyclelivedata-ktx", version.ref = "lifecycle" }
+
+
+# Coroutines
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutinesandroid", version.ref = "coroutines" }
+androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacysupport-v4", version.ref = "legacySupportV4" }
+androidx-fragment-ktx = { group = "androidx.fragment", name = "fragmentktx", version.ref = "fragmentKtx" }
+
+
+# Navigation
 androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
 [plugins]
