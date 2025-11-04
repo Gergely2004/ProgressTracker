@@ -1,5 +1,7 @@
 package com.example.progress.model
 
+import com.google.gson.annotations.SerializedName
+
 data class User(
     val id: String,
     val email: String,
@@ -8,13 +10,17 @@ data class User(
 data class AuthRequest(
     val email: String,
     val password: String,
-    val name: String? = null // only used in signup
+    val username: String? = null // only used in signup
 )
 data class Tokens(
     val accessToken: String,
     val refreshToken: String
 )
-data class AuthResponse(
+data class AuthResponseDto(
+    @SerializedName("message")
+    val message: String,
+    @SerializedName ("tokens")
     val tokens: Tokens,
-    val user: User
+    @SerializedName("user")
+    val user: User,
 )

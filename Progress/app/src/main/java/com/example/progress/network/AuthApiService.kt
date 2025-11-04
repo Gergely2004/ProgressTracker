@@ -1,4 +1,37 @@
 package com.example.progress.network
 
-interface AuthApiService1 {
+import com.example.progress.model.AuthRequest
+//import com.example.progress.model.AuthResponse
+import com.example.progress.model.AuthResponseDto
+import com.example.progress.model.ScheduleResponseDto
+import com.example.progress.model.CreateHabitDto
+import com.example.progress.model.CreateCustomScheduleDto
+import com.example.progress.model.HabitResponse
+import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Query
+
+interface ApiService {
+
+    @POST("/auth/local/signin")
+    suspend fun login(@Body request: AuthRequest): Response<AuthResponseDto>
+
+    @POST("/auth/local/signup")
+    suspend fun signup(@Body request: AuthRequest): Response<AuthResponseDto>
+
+    @GET("/schedule/day")
+    suspend fun getScheduleByDay(@Query("date") day: String): List<ScheduleResponseDto>
+
+    // List habits
+    @GET("/habit")
+    suspend fun listHabits(): List<HabitResponse>
+
+    @POST("/habit")
+    suspend fun createHabit(@Body request: CreateHabitDto): Response<HabitResponse>
+
+    // Create custom schedule
+    @POST("/schedule/custom")
+    suspend fun createCustomSchedule(@Body request: CreateCustomScheduleDto): Response<ScheduleResponseDto>
 }

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Progress</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Strings used by HomeScheduleAdapter -->
+    <string name="unknown_habit">Unknown Habit</string>
+    <string name="unknown_time">-</string>
+</resources>
