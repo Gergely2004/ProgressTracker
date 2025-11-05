@@ -6,6 +6,7 @@ import com.example.progress.model.AuthResponseDto
 import com.example.progress.model.ScheduleResponseDto
 import com.example.progress.model.CreateHabitDto
 import com.example.progress.model.CreateCustomScheduleDto
+import com.example.progress.model.CreateRecurringScheduleDto
 import com.example.progress.model.HabitResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -34,4 +35,8 @@ interface ApiService {
     // Create custom schedule
     @POST("/schedule/custom")
     suspend fun createCustomSchedule(@Body request: CreateCustomScheduleDto): Response<ScheduleResponseDto>
+
+    // Create recurring schedules
+    @POST("/schedule/recurring")
+    suspend fun createRecurringSchedule(@Body request: CreateRecurringScheduleDto): Response<List<ScheduleResponseDto>>
 }

@@ -4,9 +4,7 @@ import androidx.lifecycle.*
 import com.example.progress.model.ScheduleResponseDto
 import com.example.progress.repository.ScheduleRepository
 import kotlinx.coroutines.launch
-/**
- * ViewModel that manages schedule-related data for the ScheduleFragment.
- */
+
 class HomeViewModel(private val repository: ScheduleRepository) :
     ViewModel() {
     private val _schedules = MutableLiveData<List<ScheduleResponseDto>>()

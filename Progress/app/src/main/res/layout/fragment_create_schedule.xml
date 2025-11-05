@@ -143,11 +143,47 @@
                     android:textSize="18sp"
                     android:layout_marginBottom="12dp"/>
 
+                <!-- Schedule type toggle -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Type"
+                    android:textStyle="bold"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/scheduleTypeGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="true"
+                    app:selectionRequired="true"
+                    app:checkedButton="@id/btnTypeCustom">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTypeCustom"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Custom" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTypeRecurring"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Recurring" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Date (YYYY-MM-DD)"
-                    app:boxBackgroundMode="filled">
+                    app:boxBackgroundMode="filled"
+                    android:layout_marginTop="12dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etDate"
                         android:layout_width="match_parent"
@@ -157,6 +193,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilStartTime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Start time (ISO 8601)"
@@ -171,12 +208,14 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilRepeat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Repeat pattern"
                     app:endIconMode="dropdown_menu"
                     app:boxBackgroundMode="filled"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone">
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/actRepeat"
                         android:layout_width="match_parent"

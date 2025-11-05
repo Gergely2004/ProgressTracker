@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.progress.model.CreateHabitDto
 import com.example.progress.model.CreateCustomScheduleDto
+import com.example.progress.model.CreateRecurringScheduleDto
 import com.example.progress.model.HabitResponse
 import com.example.progress.repository.HabitRepository
 import com.example.progress.repository.ScheduleRepository
@@ -47,7 +48,9 @@ class CreateScheduleViewModel(app: Application) : AndroidViewModel(app) {
                     startTime = startTime,
                     endTime = null,
                     durationMinutes = duration,
-                    isCustom = true
+                    isCustom = true,
+                    participantIds = null,
+                    notes = notes
                 )
                 val resp = repo.createCustomSchedule(req)
                 if (resp.isSuccessful) {
@@ -90,7 +93,9 @@ class CreateScheduleViewModel(app: Application) : AndroidViewModel(app) {
                     startTime = startTime,
                     endTime = null,
                     durationMinutes = duration,
-                    isCustom = true
+                    isCustom = true,
+                    participantIds = null,
+                    notes = notes
                 )
                 val schedResp = repo.createCustomSchedule(req)
                 if (schedResp.isSuccessful) {
@@ -98,6 +103,83 @@ class CreateScheduleViewModel(app: Application) : AndroidViewModel(app) {
                 } else {
                     val body2 = try { schedResp.errorBody()?.string() } catch (_: Exception) { null }
                     _createResult.postValue(Result.failure(Exception("Create failed ${schedResp.code()} ${body2 ?: ""}")))
+                }
+            } catch (e: Exception) {
+                _createResult.postValue(Result.failure(e))
+            }
+        }
+    }
+
+    fun createRecurringSchedule(
+        habitId: Long,
+        startTime: String,
+        repeatPattern: String,
+        duration: Int?,
+        notes: String?
+    ) {
+        viewModelScope.launch {
+            try {
+                val req = CreateRecurringScheduleDto(
+                    habitId = habitId,
+                    startTime = startTime,
+                    endTime = null,
+                    durationMinutes = duration,
+                    repeatPattern = repeatPattern,
+                    repeatDays = 30,
+                    isCustom = true,
+                    participantIds = null,
+                    notes = notes
+                )
+                val resp = repo.createRecurringSchedule(req)
+                if (resp.isSuccessful) {
+                    _createResult.postValue(Result.success(Unit))
+                } else {
+                    val body = try { resp.errorBody()?.string() } catch (_: Exception) { null }
+                    _createResult.postValue(Result.failure(Exception("Recurring create failed ${resp.code()} ${body ?: ""}")))
+                }
+            } catch (e: Exception) {
+                _createResult.postValue(Result.failure(e))
+            }
+        }
+    }
+
+    fun createHabitThenRecurringSchedule(
+        name: String,
+        description: String?,
+        categoryId: Long,
+        goal: String,
+        startTime: String,
+        repeatPattern: String,
+        duration: Int?,
+        notes: String?
+    ) {
+        viewModelScope.launch {
+            try {
+                val habitRepo = HabitRepository(getApplication())
+                val createResp = habitRepo.createHabit(CreateHabitDto(name, description, categoryId, goal))
+                if (!createResp.isSuccessful || createResp.body() == null) {
+                    val body = try { createResp.errorBody()?.string() } catch (_: Exception) { null }
+                    _createResult.postValue(Result.failure(Exception("Habit creation failed ${createResp.code()} ${body ?: ""}")))
+                    return@launch
+                }
+                val habitId = createResp.body()!!.id
+                val req = CreateRecurringScheduleDto(
+                    habitId = habitId,
+                    startTime = startTime,
+                    endTime = null,
+                    durationMinutes = duration,
+                    repeatPattern = repeatPattern,
+                    repeatDays = 30,
+                    isCustom = true,
+                    participantIds = null,
+                    notes = notes
+                )
+                val resp = repo.createRecurringSchedule(req)
+                if (resp.isSuccessful) {
+                    _createResult.postValue(Result.success(Unit))
+                } else {
+                    val body = try { resp.errorBody()?.string() } catch (_: Exception) { null }
+                    _createResult.postValue(Result.failure(Exception("Recurring create failed ${resp.code()} ${body ?: ""}")))
                 }
             } catch (e: Exception) {
                 _createResult.postValue(Result.failure(e))

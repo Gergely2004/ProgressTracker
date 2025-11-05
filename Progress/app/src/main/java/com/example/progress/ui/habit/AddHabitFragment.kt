@@ -50,7 +50,7 @@ class AddHabitFragment : Fragment() {
         viewModel.createResult.observe(viewLifecycleOwner) { result ->
             result.onSuccess { habit ->
                 Toast.makeText(requireContext(), "Habit '${habit.name}' created", Toast.LENGTH_LONG).show()
-                // Navigate back to previous screen
+
                 try { findNavController().navigateUp() } catch (_: Exception) { /* no-op */ }
             }.onFailure { err ->
                 Toast.makeText(requireContext(), "Failed to create habit: ${err.message}", Toast.LENGTH_LONG).show()

@@ -28,7 +28,7 @@ class HomeScheduleAdapter : ListAdapter<ScheduleResponseDto, HomeScheduleAdapter
             val timeText = item.startTime?.toLocalTime()?.toString() ?: "--:--"
             binding.tvTime.text = timeText
             binding.tvTitle.text = item.habit?.name ?: "Unknown Habit"
-            // status
+
             val status = item.status ?: "Planned"
             binding.tvStatus.text = when (status.lowercase()) {
                 "completed" -> "Completed"
@@ -41,7 +41,7 @@ class HomeScheduleAdapter : ListAdapter<ScheduleResponseDto, HomeScheduleAdapter
                 else -> 0xFF616161.toInt() // grey
             }
             binding.tvStatus.setTextColor(statusColor)
-            // notes optional
+
             binding.tvNotes.text = item.notes ?: ""
             binding.tvNotes.isVisible = !item.notes.isNullOrEmpty()
         }

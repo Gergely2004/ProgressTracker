@@ -16,6 +16,7 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class CreateScheduleFragment : Fragment() {
 
@@ -56,6 +57,8 @@ class CreateScheduleFragment : Fragment() {
         viewModel.loadHabits()
     }
 
+    private fun isRecurringSelected(): Boolean = binding.scheduleTypeGroup.checkedButtonId == binding.btnTypeRecurring.id
+
     private fun setupUi() {
         val repeatOptions: List<String> = listOf("none", "daily", "weekdays", "weekends")
         binding.actRepeat.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1, repeatOptions))
@@ -65,71 +68,133 @@ class CreateScheduleFragment : Fragment() {
             binding.groupNewHabit.visibility = if (isChecked) View.GONE else View.VISIBLE
         }
 
+        // Schedule type toggle behavior
+        binding.scheduleTypeGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
+            val isRecurring = checkedId == binding.btnTypeRecurring.id
+            binding.tilRepeat.visibility = if (isRecurring) View.VISIBLE else View.GONE
+            binding.tilDate.visibility = if (isRecurring) View.GONE else View.VISIBLE
+            // Refresh the displayed start time format on toggle
+            updateStartTimeField()
+        }
+
         binding.btnCancel.setOnClickListener { findNavController().navigateUp() }
 
         binding.btnCreate.setOnClickListener {
             val dateText = binding.etDate.text?.toString()?.trim().orEmpty()
-            val startText = binding.etStartTime.text?.toString()?.trim().orEmpty()
             val duration = binding.etDuration.text?.toString()?.toIntOrNull()
+            val notes = binding.etNotes.text?.toString()?.trim()?.ifEmpty { null }
+            val repeatPattern = binding.actRepeat.text?.toString()?.trim()?.lowercase().orEmpty()
 
-            // Build ISO strings using picked values when available
-            val isoDate: String = pickedDate?.atStartOfDay()?.format(isoDateTimeFormatter)
-                ?: if (dateText.isNotEmpty()) "${dateText}T00:00:00" else ""
-            val isoStart: String = if (pickedDate != null && pickedStartHour != null && pickedStartMinute != null) {
-                val dt = LocalDateTime.of(pickedDate, LocalTime.of(pickedStartHour!!, pickedStartMinute!!, 0))
-                dt.format(isoDateTimeFormatter)
-            } else startText
+            val selectedIsRecurring = isRecurringSelected()
 
-            if (isoDate.isEmpty() || isoStart.isEmpty()) {
-                Toast.makeText(requireContext(), "Date and Start time are required", Toast.LENGTH_SHORT).show()
+            // Build ISO start time based on mode and picked values
+            val isoStart: String? = if (pickedStartHour != null && pickedStartMinute != null) {
+                val dateForStart = if (selectedIsRecurring) LocalDate.now() else pickedDate
+                if (dateForStart != null) {
+                    LocalDateTime.of(dateForStart, LocalTime.of(pickedStartHour!!, pickedStartMinute!!, 0))
+                        .format(isoDateTimeFormatter)
+                } else null
+            } else null
+
+            if (isoStart.isNullOrEmpty()) {
+                Toast.makeText(requireContext(), "Please pick a start time", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val useExisting = binding.switchUseExisting.isChecked
-            if (useExisting) {
-                val habitId = viewModel.resolveSelectedHabitId(binding.actHabit.text?.toString())
-                if (habitId == null) {
-                    Toast.makeText(requireContext(), "Please select a habit", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
+            if (selectedIsRecurring) {
+                val useExisting = binding.switchUseExisting.isChecked
+                val rp = when (repeatPattern) {
+                    "daily", "weekdays", "weekends" -> repeatPattern
+                    else -> "daily" // sensible default
                 }
-                viewModel.createScheduleCustom(
-                    date = isoDate,
-                    startTime = isoStart,
-                    notes = null,
-                    duration = duration,
-                    habitId = habitId
-                )
+                if (useExisting) {
+                    val habitId = viewModel.resolveSelectedHabitId(binding.actHabit.text?.toString())
+                    if (habitId == null) {
+                        Toast.makeText(requireContext(), "Please select a habit", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    viewModel.createRecurringSchedule(
+                        habitId = habitId,
+                        startTime = isoStart,
+                        repeatPattern = rp,
+                        duration = duration,
+                        notes = notes
+                    )
+                } else {
+                    val name = binding.etHabitName.text?.toString()?.trim().orEmpty()
+                    val description = binding.etHabitDescription.text?.toString()?.trim()?.ifEmpty { null }
+                    val categoryId = binding.etCategoryId.text?.toString()?.toLongOrNull()
+                    val goal = binding.etHabitGoal.text?.toString()?.trim().orEmpty()
+                    if (name.isEmpty() || categoryId == null || goal.isEmpty()) {
+                        Toast.makeText(requireContext(), "Name, Category ID, and Goal are required for new habit", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    viewModel.createHabitThenRecurringSchedule(
+                        name = name,
+                        description = description,
+                        categoryId = categoryId,
+                        goal = goal,
+                        startTime = isoStart,
+                        repeatPattern = rp,
+                        duration = duration,
+                        notes = notes
+                    )
+                }
             } else {
-                val name = binding.etHabitName.text?.toString()?.trim().orEmpty()
-                val description = binding.etHabitDescription.text?.toString()?.trim()?.ifEmpty { null }
-                val categoryId = binding.etCategoryId.text?.toString()?.toLongOrNull()
-                val goal = binding.etHabitGoal.text?.toString()?.trim().orEmpty()
-                if (name.isEmpty() || categoryId == null || goal.isEmpty()) {
-                    Toast.makeText(requireContext(), "Name, Category ID, and Goal are required for new habit", Toast.LENGTH_SHORT).show()
+                // Custom schedule requires a date
+                val isoDate: String = pickedDate?.atStartOfDay()?.format(isoDateTimeFormatter)
+                    ?: if (dateText.isNotEmpty()) "${dateText}T00:00:00" else ""
+                if (isoDate.isEmpty()) {
+                    Toast.makeText(requireContext(), "Date is required for custom schedule", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-                viewModel.createHabitThenCustomSchedule(
-                    name = name,
-                    description = description,
-                    categoryId = categoryId,
-                    goal = goal,
-                    date = isoDate,
-                    startTime = isoStart,
-                    notes = null,
-                    duration = duration
-                )
+
+                val useExisting = binding.switchUseExisting.isChecked
+                if (useExisting) {
+                    val habitId = viewModel.resolveSelectedHabitId(binding.actHabit.text?.toString())
+                    if (habitId == null) {
+                        Toast.makeText(requireContext(), "Please select a habit", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    viewModel.createScheduleCustom(
+                        date = isoDate,
+                        startTime = isoStart,
+                        notes = notes,
+                        duration = duration,
+                        habitId = habitId
+                    )
+                } else {
+                    val name = binding.etHabitName.text?.toString()?.trim().orEmpty()
+                    val description = binding.etHabitDescription.text?.toString()?.trim()?.ifEmpty { null }
+                    val categoryId = binding.etCategoryId.text?.toString()?.toLongOrNull()
+                    val goal = binding.etHabitGoal.text?.toString()?.trim().orEmpty()
+                    if (name.isEmpty() || categoryId == null || goal.isEmpty()) {
+                        Toast.makeText(requireContext(), "Name, Category ID, and Goal are required for new habit", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    viewModel.createHabitThenCustomSchedule(
+                        name = name,
+                        description = description,
+                        categoryId = categoryId,
+                        goal = goal,
+                        date = isoDate,
+                        startTime = isoStart,
+                        notes = notes,
+                        duration = duration
+                    )
+                }
             }
         }
     }
 
     private fun setupPickers() {
-        // Open date picker when tapping the field
         binding.etDate.apply {
             isFocusable = false
             isClickable = true
             setOnClickListener { showDatePicker() }
         }
-        // Open time picker when tapping the field
+
         binding.etStartTime.apply {
             isFocusable = false
             isClickable = true
@@ -147,7 +212,7 @@ class CreateScheduleFragment : Fragment() {
             val localDate = Instant.ofEpochMilli(selection).atZone(zone).toLocalDate()
             pickedDate = localDate
             binding.etDate.setText(localDate.format(isoDateFormatter))
-            // If time already selected, update start time field to ISO
+
             updateStartTimeField()
         }
         picker.show(childFragmentManager, "date_picker")
@@ -171,12 +236,21 @@ class CreateScheduleFragment : Fragment() {
     }
 
     private fun updateStartTimeField() {
-        val d = pickedDate
         val h = pickedStartHour
         val m = pickedStartMinute
-        if (d != null && h != null && m != null) {
-            val dt = LocalDateTime.of(d, LocalTime.of(h, m, 0))
-            binding.etStartTime.setText(dt.format(isoDateTimeFormatter))
+        if (h == null || m == null) return
+
+        val timeOnly = String.format(Locale.getDefault(), "%02d:%02d", h, m)
+        if (isRecurringSelected()) {
+            binding.etStartTime.setText(timeOnly)
+        } else {
+            val d = pickedDate
+            if (d != null) {
+                val dt = LocalDateTime.of(d, LocalTime.of(h, m, 0))
+                binding.etStartTime.setText(dt.format(isoDateTimeFormatter))
+            } else {
+                binding.etStartTime.setText(timeOnly)
+            }
         }
     }
 

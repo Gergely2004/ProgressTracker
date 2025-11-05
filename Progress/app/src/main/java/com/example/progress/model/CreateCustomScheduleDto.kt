@@ -2,9 +2,6 @@ package com.example.progress.model
 
 import com.google.gson.annotations.SerializedName
 
-// Matches: { habitId, date, start_time, end_time?, duration_minutes?, is_custom }
-// All date/time fields are strings (ISO 8601).
-
 data class CreateCustomScheduleDto(
     @SerializedName("habitId")
     val habitId: Long,
@@ -22,6 +19,11 @@ data class CreateCustomScheduleDto(
     val durationMinutes: Int? = null,
 
     @SerializedName("is_custom")
-    val isCustom: Boolean = true
-)
+    val isCustom: Boolean = true,
 
+    @SerializedName("participantIds")
+    val participantIds: List<Long>? = null,
+
+    @SerializedName("notes")
+    val notes: String? = null
+)
