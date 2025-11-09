@@ -3,6 +3,7 @@ package com.example.progress.repository
 import android.content.Context
 import com.example.progress.model.CreateCustomScheduleDto
 import com.example.progress.model.CreateRecurringScheduleDto
+import com.example.progress.model.CreateWeekdayRecurringDto
 import com.example.progress.model.HabitResponse
 import com.example.progress.model.ScheduleResponseDto
 import com.example.progress.network.RetrofitClient
@@ -20,4 +21,6 @@ class ScheduleRepository(context: Context) {
     suspend fun createCustomSchedule(request: CreateCustomScheduleDto): Response<ScheduleResponseDto> = api.createCustomSchedule(request)
 
     suspend fun createRecurringSchedule(request: CreateRecurringScheduleDto): Response<List<ScheduleResponseDto>> = api.createRecurringSchedule(request)
+
+    suspend fun createWeekdayRecurringSchedule(request: CreateWeekdayRecurringDto): Response<List<ScheduleResponseDto>> = api.createWeekdayRecurring(request)
 }

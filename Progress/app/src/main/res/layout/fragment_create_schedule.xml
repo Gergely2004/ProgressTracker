@@ -177,6 +177,7 @@
                         android:text="Recurring" />
                 </com.google.android.material.button.MaterialButtonToggleGroup>
 
+                <!-- Custom date and time -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilDate"
                     android:layout_width="match_parent"
@@ -193,20 +194,38 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilStartTime"
+                    android:id="@+id/tilStartTimeCustom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Start time (ISO 8601)"
                     app:boxBackgroundMode="filled"
                     android:layout_marginTop="8dp">
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etStartTime"
+                        android:id="@+id/etStartTimeCustom"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="YYYY-MM-DDThh:mm:ss"
                         android:inputType="datetime"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Recurring time only -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilStartTimeRecurring"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Start time (HH:MM)"
+                    app:boxBackgroundMode="filled"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etStartTimeRecurring"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="08:00"
+                        android:inputType="time"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Repeat pattern dropdown -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilRepeat"
                     android:layout_width="match_parent"
@@ -221,6 +240,103 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Weekday selection chips -->
+                <LinearLayout
+                    android:id="@+id/weekdayContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Select weekdays"
+                        android:textStyle="bold"/>
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupWeekdays"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="4dp"
+                        app:singleSelection="false">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipMon"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Mon"
+                            android:tag="1"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipTue"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tue"
+                            android:tag="2"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipWed"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Wed"
+                            android:tag="3"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipThu"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Thu"
+                            android:tag="4"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipFri"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Fri"
+                            android:tag="5"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipSat"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sat"
+                            android:tag="6"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipSun"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sun"
+                            android:tag="7"/>
+
+                    </com.google.android.material.chip.ChipGroup>
+                </LinearLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilNumberOfWeeks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Number of weeks"
+                    app:boxBackgroundMode="filled"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etNumberOfWeeks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:text="4"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.progress.model.CreateHabitDto
 import com.example.progress.model.CreateCustomScheduleDto
 import com.example.progress.model.CreateRecurringScheduleDto
+import com.example.progress.model.CreateWeekdayRecurringDto
 import com.example.progress.model.HabitResponse
 import com.example.progress.repository.HabitRepository
 import com.example.progress.repository.ScheduleRepository
@@ -143,6 +144,39 @@ class CreateScheduleViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun createWeekdayRecurringSchedule(
+        habitId: Long,
+        startTime: String,
+        daysOfWeek: List<Int>,
+        numberOfWeeks: Int,
+        duration: Int?,
+        notes: String?
+    ) {
+        viewModelScope.launch {
+            try {
+                val req = CreateWeekdayRecurringDto(
+                    habitId = habitId,
+                    startTime = startTime,
+                    durationMinutes = duration,
+                    endTime = null,
+                    daysOfWeek = daysOfWeek,
+                    numberOfWeeks = numberOfWeeks,
+                    participantIds = null,
+                    notes = notes
+                )
+                val resp = repo.createWeekdayRecurringSchedule(req)
+                if (resp.isSuccessful) {
+                    _createResult.postValue(Result.success(Unit))
+                } else {
+                    val body = try { resp.errorBody()?.string() } catch (_: Exception) { null }
+                    _createResult.postValue(Result.failure(Exception("Weekday recurring failed ${resp.code()} ${body ?: ""}")))
+                }
+            } catch (e: Exception) {
+                _createResult.postValue(Result.failure(e))
+            }
+        }
+    }
+
     fun createHabitThenRecurringSchedule(
         name: String,
         description: String?,
@@ -180,6 +214,50 @@ class CreateScheduleViewModel(app: Application) : AndroidViewModel(app) {
                 } else {
                     val body = try { resp.errorBody()?.string() } catch (_: Exception) { null }
                     _createResult.postValue(Result.failure(Exception("Recurring create failed ${resp.code()} ${body ?: ""}")))
+                }
+            } catch (e: Exception) {
+                _createResult.postValue(Result.failure(e))
+            }
+        }
+    }
+
+    fun createHabitThenWeekdayRecurringSchedule(
+        name: String,
+        description: String?,
+        categoryId: Long,
+        goal: String,
+        startTime: String,
+        daysOfWeek: List<Int>,
+        numberOfWeeks: Int,
+        duration: Int?,
+        notes: String?
+    ) {
+        viewModelScope.launch {
+            try {
+                val habitRepo = HabitRepository(getApplication())
+                val createResp = habitRepo.createHabit(CreateHabitDto(name, description, categoryId, goal))
+                if (!createResp.isSuccessful || createResp.body() == null) {
+                    val body = try { createResp.errorBody()?.string() } catch (_: Exception) { null }
+                    _createResult.postValue(Result.failure(Exception("Habit creation failed ${createResp.code()} ${body ?: ""}")))
+                    return@launch
+                }
+                val habitId = createResp.body()!!.id
+                val req = CreateWeekdayRecurringDto(
+                    habitId = habitId,
+                    startTime = startTime,
+                    durationMinutes = duration,
+                    endTime = null,
+                    daysOfWeek = daysOfWeek,
+                    numberOfWeeks = numberOfWeeks,
+                    participantIds = null,
+                    notes = notes
+                )
+                val resp = repo.createWeekdayRecurringSchedule(req)
+                if (resp.isSuccessful) {
+                    _createResult.postValue(Result.success(Unit))
+                } else {
+                    val body = try { resp.errorBody()?.string() } catch (_: Exception) { null }
+                    _createResult.postValue(Result.failure(Exception("Weekday recurring failed ${resp.code()} ${body ?: ""}")))
                 }
             } catch (e: Exception) {
                 _createResult.postValue(Result.failure(e))
