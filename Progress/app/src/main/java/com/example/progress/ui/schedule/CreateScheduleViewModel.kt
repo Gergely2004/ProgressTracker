@@ -10,7 +10,7 @@ import com.example.progress.model.CreateHabitDto
 import com.example.progress.model.CreateCustomScheduleDto
 import com.example.progress.model.CreateRecurringScheduleDto
 import com.example.progress.model.CreateWeekdayRecurringDto
-import com.example.progress.model.HabitResponse
+import com.example.progress.model.HabitResponseDto
 import com.example.progress.repository.HabitRepository
 import com.example.progress.repository.ScheduleRepository
 import kotlinx.coroutines.launch
@@ -18,8 +18,8 @@ import kotlinx.coroutines.launch
 class CreateScheduleViewModel(app: Application) : AndroidViewModel(app) {
     private val repo = ScheduleRepository(app)
 
-    private val _habits = MutableLiveData<List<HabitResponse>>()
-    val habits: LiveData<List<HabitResponse>> = _habits
+    private val _habits = MutableLiveData<List<HabitResponseDto>>()
+    val habits: LiveData<List<HabitResponseDto>> = _habits
 
     private val _createResult = MutableLiveData<Result<Unit>>()
     val createResult: LiveData<Result<Unit>> = _createResult

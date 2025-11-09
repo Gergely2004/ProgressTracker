@@ -4,7 +4,7 @@ import android.content.Context
 import com.example.progress.model.CreateCustomScheduleDto
 import com.example.progress.model.CreateRecurringScheduleDto
 import com.example.progress.model.CreateWeekdayRecurringDto
-import com.example.progress.model.HabitResponse
+import com.example.progress.model.HabitResponseDto
 import com.example.progress.model.ScheduleResponseDto
 import com.example.progress.network.RetrofitClient
 import retrofit2.Response
@@ -16,7 +16,7 @@ class ScheduleRepository(context: Context) {
         return api.getScheduleByDay(day)
     }
 
-    suspend fun listHabits(): List<HabitResponse> = api.listHabits()
+    suspend fun listHabits(): List<HabitResponseDto> = api.listHabits()
 
     suspend fun createCustomSchedule(request: CreateCustomScheduleDto): Response<ScheduleResponseDto> = api.createCustomSchedule(request)
 

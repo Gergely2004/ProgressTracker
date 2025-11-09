@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.progress.databinding.FragmentCreateScheduleBinding
-import com.example.progress.model.HabitResponse
+import com.example.progress.model.HabitResponseDto
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -296,7 +296,7 @@ class CreateScheduleFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.habits.observe(viewLifecycleOwner) { list: List<HabitResponse> ->
+        viewModel.habits.observe(viewLifecycleOwner) { list: List<HabitResponseDto> ->
             val names: List<String> = list.map { it.name }
             binding.actHabit.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, names))
         }

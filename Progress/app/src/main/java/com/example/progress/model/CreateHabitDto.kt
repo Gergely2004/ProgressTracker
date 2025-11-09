@@ -9,8 +9,8 @@ data class CreateHabitDto(
     @SerializedName("description")
     val description: String? = null,
 
-    // Backend expects snake_case for consistency with other fields
-    @SerializedName("category_id")
+    // Backend expects camelCase for categoryId as per API contract
+    @SerializedName("categoryId")
     val categoryId: Long,
 
     @SerializedName("goal")

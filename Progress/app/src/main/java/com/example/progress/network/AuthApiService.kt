@@ -1,14 +1,14 @@
 package com.example.progress.network
 
 import com.example.progress.model.AuthRequest
-//import com.example.progress.model.AuthResponse
 import com.example.progress.model.AuthResponseDto
 import com.example.progress.model.ScheduleResponseDto
 import com.example.progress.model.CreateHabitDto
 import com.example.progress.model.CreateCustomScheduleDto
 import com.example.progress.model.CreateRecurringScheduleDto
-import com.example.progress.model.HabitResponse
+import com.example.progress.model.HabitResponseDto
 import com.example.progress.model.CreateWeekdayRecurringDto
+import com.example.progress.model.HabitCategory
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -28,10 +28,14 @@ interface ApiService {
 
     // List habits
     @GET("/habit")
-    suspend fun listHabits(): List<HabitResponse>
+    suspend fun listHabits(): List<HabitResponseDto>
+
+    // List habit categories
+    @GET("/habit/categories")
+    suspend fun listHabitCategories(): List<HabitCategory>
 
     @POST("/habit")
-    suspend fun createHabit(@Body request: CreateHabitDto): Response<HabitResponse>
+    suspend fun createHabit(@Body request: CreateHabitDto): Response<HabitResponseDto>
 
     // Create custom schedule
     @POST("/schedule/custom")

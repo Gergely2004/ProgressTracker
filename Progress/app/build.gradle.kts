@@ -65,5 +65,6 @@ dependencies {
 
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+    implementation("io.coil-kt:coil:2.7.0")
 
 }

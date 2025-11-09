@@ -22,12 +22,12 @@ data class ScheduleResponseDto(
     val durationMinutes: Int? = null,
     val notes: String? = null,
     val participants: List<ParticipantDto>? = emptyList(),
-    val habit: HabitResponse? = null,
+    val habit: HabitResponseDto? = null,
     val progress: List<ProgressResponseDto>? = emptyList(),
     val isParticipantOnly: Boolean,
 )
 
-data class HabitResponse (
+data class HabitResponseDto (
     val id: Long,
     val name: String,
     val description: String? = null,
