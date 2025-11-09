@@ -11,8 +11,19 @@ import com.example.progress.model.ScheduleResponseDto
 import androidx.core.view.isVisible
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import com.google.android.material.checkbox.MaterialCheckBox
 
-class HomeScheduleAdapter : ListAdapter<ScheduleResponseDto, HomeScheduleAdapter.ViewHolder> (DiffCallback()) {
+class HomeScheduleAdapter(
+    private val onItemClick: (ScheduleResponseDto) -> Unit,
+    private val onToggleComplete: (ScheduleResponseDto, Boolean) -> Unit
+) : ListAdapter<ScheduleResponseDto, HomeScheduleAdapter.ViewHolder> (DiffCallback()) {
+
+    private var inFlight: Set<Long> = emptySet()
+    fun updateInFlight(ids: Set<Long>) {
+        inFlight = ids
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemHomeScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
@@ -21,6 +32,9 @@ class HomeScheduleAdapter : ListAdapter<ScheduleResponseDto, HomeScheduleAdapter
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         holder.bind(item)
+        holder.itemView.setOnClickListener { onItemClick(item) }
+        holder.bindToggle(item, onToggleComplete)
+        holder.setEnabled(!inFlight.contains(item.id))
     }
 
     class ViewHolder(private val binding: ItemHomeScheduleBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -44,7 +58,17 @@ class HomeScheduleAdapter : ListAdapter<ScheduleResponseDto, HomeScheduleAdapter
 
             binding.tvNotes.text = item.notes ?: ""
             binding.tvNotes.isVisible = !item.notes.isNullOrEmpty()
+
+            binding.cbDone.setOnCheckedChangeListener(null)
+            binding.cbDone.isChecked = status.equals("completed", ignoreCase = true)
+            // Disable during in-flight handled by adapter: set in onBind
         }
+        fun bindToggle(item: ScheduleResponseDto, onToggle: (ScheduleResponseDto, Boolean) -> Unit) {
+            binding.cbDone.setOnCheckedChangeListener { _, isChecked ->
+                onToggle(item, isChecked)
+            }
+        }
+        fun setEnabled(enabled: Boolean) { binding.cbDone.isEnabled = enabled }
     }
 
     class DiffCallback : DiffUtil.ItemCallback<ScheduleResponseDto>() {

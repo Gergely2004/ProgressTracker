@@ -9,6 +9,8 @@ import com.example.progress.model.CreateRecurringScheduleDto
 import com.example.progress.model.HabitResponseDto
 import com.example.progress.model.CreateWeekdayRecurringDto
 import com.example.progress.model.HabitCategory
+import com.example.progress.model.CreateProgressDto
+import com.example.progress.model.ProgressResponseDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -48,4 +50,7 @@ interface ApiService {
     // Create weekday recurring schedules
     @POST("/schedule/recurring/weekdays")
     suspend fun createWeekdayRecurring(@Body request: CreateWeekdayRecurringDto): Response<List<ScheduleResponseDto>>
+
+    @POST("/progress")
+    suspend fun createProgress(@Body request: CreateProgressDto): Response<ProgressResponseDto>
 }

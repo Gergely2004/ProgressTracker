@@ -8,6 +8,9 @@
         <action android:id="@+id/action_homeFragment_to_profileFragment" app:destination="@id/profileFragment"/>
         <action android:id="@+id/action_homeFragment_to_addHabitFragment" app:destination="@id/addHabitFragment"/>
         <action android:id="@+id/action_homeFragment_to_createScheduleFragment" app:destination="@id/createScheduleFragment"/>
+        <action android:id="@+id/action_homeFragment_to_createScheduleFragment2"
+                app:destination="@id/createScheduleFragment"/>
+        <action android:id="@+id/action_homeFragment_to_addProgressFragment" app:destination="@id/addProgressFragment"/>
     </fragment>
     <fragment android:id="@+id/loginFragment" android:name="com.example.progress.ui.auth.LoginFragment"
               android:label="fragment_login" tools:layout="@layout/fragment_login">
@@ -25,4 +28,8 @@
     </fragment>
     <fragment android:id="@+id/createScheduleFragment" android:name="com.example.progress.ui.schedule.CreateScheduleFragment"
               android:label="fragment_create_schedule" tools:layout="@layout/fragment_create_schedule"/>
+    <fragment android:id="@+id/addProgressFragment" android:name="com.example.progress.ui.progress.AddProgressFragment"
+              android:label="fragment_add_progress" tools:layout="@layout/fragment_add_progress">
+        <argument android:name="scheduleId" app:argType="long"/>
+    </fragment>
 </navigation>

@@ -6,17 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.progress.R
 import com.example.progress.databinding.FragmentHomeBinding
+import com.example.progress.model.CreateProgressDto
+import com.example.progress.model.ScheduleResponseDto
+import com.example.progress.repository.ProgressRepository
 import com.example.progress.repository.ScheduleRepository
+import kotlinx.coroutines.launch
 import java.time.LocalDate
-
 
 class HomeViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -28,19 +33,23 @@ class HomeViewModelFactory(private val context: Context) : ViewModelProvider.Fac
     }
 }
 
-
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: HomeViewModel
     private lateinit var adapter: HomeScheduleAdapter
+    private lateinit var progressRepo: ProgressRepository
+
+    private var currentSchedules: List<ScheduleResponseDto> = emptyList()
+    private val togglingIds = mutableSetOf<Long>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val factory = HomeViewModelFactory(requireContext())
         viewModel = ViewModelProvider(this, factory) [HomeViewModel::class.java]
+        progressRepo = ProgressRepository(requireContext())
     }
 
     override fun onCreateView(
@@ -73,7 +82,69 @@ class HomeFragment : Fragment() {
             }
         }
 
-        adapter = HomeScheduleAdapter()
+        adapter = HomeScheduleAdapter(
+            onItemClick = { sched ->
+                try {
+                    findNavController().navigate(R.id.action_homeFragment_to_addProgressFragment, bundleOf("scheduleId" to sched.id))
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "Navigation failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            },
+            onToggleComplete = { sched, markCompleted ->
+                if (togglingIds.contains(sched.id)) return@HomeScheduleAdapter
+                togglingIds.add(sched.id)
+                adapter.updateInFlight(togglingIds)
+
+                // Optimistic UI update
+                val prevList = currentSchedules
+                val idx = prevList.indexOfFirst { it.id == sched.id }
+                if (idx >= 0) {
+                    val prev = prevList[idx]
+                    val newStatus = if (markCompleted) "Completed" else "Planned"
+                    val updated = prev.copy(status = newStatus)
+                    val newList = prevList.toMutableList().apply { set(idx, updated) }
+                    currentSchedules = newList
+                    adapter.submitList(newList.toList())
+                }
+
+                lifecycleScope.launch {
+                    try {
+                        val dateParam = sched.date ?: LocalDate.now().toString()
+                        val dto = CreateProgressDto(
+                            scheduleId = sched.id,
+                            date = dateParam,
+                            loggedTime = 0.0,
+                            notes = null,
+                            isCompleted = markCompleted
+                        )
+                        val resp = progressRepo.createProgress(dto)
+                        if (!resp.isSuccessful) {
+                            // Rollback UI
+                            if (idx >= 0) {
+                                val rollbackList = currentSchedules.toMutableList().apply { set(idx, currentSchedules[idx].copy(status = sched.status)) }
+                                currentSchedules = rollbackList
+                                adapter.submitList(rollbackList.toList())
+                            }
+                            Toast.makeText(requireContext(), "Update failed ${resp.code()}", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // Optional: refresh from server to get authoritative state
+                            viewModel.getScheduleByDay(LocalDate.now().toString())
+                        }
+                    } catch (e: Exception) {
+                        // Rollback UI
+                        if (idx >= 0) {
+                            val rollbackList = currentSchedules.toMutableList().apply { set(idx, currentSchedules[idx].copy(status = sched.status)) }
+                            currentSchedules = rollbackList
+                            adapter.submitList(rollbackList.toList())
+                        }
+                        Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    } finally {
+                        togglingIds.remove(sched.id)
+                        adapter.updateInFlight(togglingIds)
+                    }
+                }
+            }
+        )
         binding.rvSchedules.layoutManager =
             LinearLayoutManager(requireContext())
         binding.rvSchedules.adapter = adapter
@@ -86,6 +157,7 @@ class HomeFragment : Fragment() {
     }
     private fun setupObservers() {
         viewModel.schedules.observe(viewLifecycleOwner) { schedules ->
+            currentSchedules = schedules ?: emptyList()
             if (!schedules.isNullOrEmpty()) {
                 adapter.submitList(schedules)
                 binding.rvSchedules.visibility = View.VISIBLE

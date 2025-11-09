@@ -42,15 +42,26 @@ data class HabitResponseDto (
 data class HabitCategory (
     val id: Long,
     val name: String,
-    @SerializedName("icon_url")
+    @SerializedName("iconUrl")
     val iconUrl: String? = null
 )
 
 data class ProgressResponseDto(
     val id: Long,
-    val userId: Long,
-    val progressValue: Double,
-    val updatedAt: LocalDateTime
+    @SerializedName("scheduleId")
+    val scheduleId: Long,
+    @SerializedName("date")
+    val date: String,
+    @SerializedName("logged_time")
+    val loggedTime: Double,
+    @SerializedName("notes")
+    val notes: String? = null,
+    @SerializedName("is_completed")
+    val isCompleted: Boolean,
+    @SerializedName("created_at")
+    val createdAt: LocalDateTime? = null,
+    @SerializedName("updated_at")
+    val updatedAt: LocalDateTime? = null
 )
 data class ParticipantDto(
     val id: Long,
