@@ -85,7 +85,7 @@ class HomeFragment : Fragment() {
         adapter = HomeScheduleAdapter(
             onItemClick = { sched ->
                 try {
-                    findNavController().navigate(R.id.action_homeFragment_to_addProgressFragment, bundleOf("scheduleId" to sched.id))
+                    findNavController().navigate(R.id.action_homeFragment_to_scheduleDetailsFragment, bundleOf("scheduleId" to sched.id))
                 } catch (e: Exception) {
                     Toast.makeText(requireContext(), "Navigation failed: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -95,7 +95,6 @@ class HomeFragment : Fragment() {
                 togglingIds.add(sched.id)
                 adapter.updateInFlight(togglingIds)
 
-                // Optimistic UI update
                 val prevList = currentSchedules
                 val idx = prevList.indexOfFirst { it.id == sched.id }
                 if (idx >= 0) {
@@ -119,7 +118,6 @@ class HomeFragment : Fragment() {
                         )
                         val resp = progressRepo.createProgress(dto)
                         if (!resp.isSuccessful) {
-                            // Rollback UI
                             if (idx >= 0) {
                                 val rollbackList = currentSchedules.toMutableList().apply { set(idx, currentSchedules[idx].copy(status = sched.status)) }
                                 currentSchedules = rollbackList
@@ -127,11 +125,9 @@ class HomeFragment : Fragment() {
                             }
                             Toast.makeText(requireContext(), "Update failed ${resp.code()}", Toast.LENGTH_SHORT).show()
                         } else {
-                            // Optional: refresh from server to get authoritative state
                             viewModel.getScheduleByDay(LocalDate.now().toString())
                         }
                     } catch (e: Exception) {
-                        // Rollback UI
                         if (idx >= 0) {
                             val rollbackList = currentSchedules.toMutableList().apply { set(idx, currentSchedules[idx].copy(status = sched.status)) }
                             currentSchedules = rollbackList

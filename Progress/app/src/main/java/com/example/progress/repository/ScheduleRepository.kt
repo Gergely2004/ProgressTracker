@@ -23,4 +23,6 @@ class ScheduleRepository(context: Context) {
     suspend fun createRecurringSchedule(request: CreateRecurringScheduleDto): Response<List<ScheduleResponseDto>> = api.createRecurringSchedule(request)
 
     suspend fun createWeekdayRecurringSchedule(request: CreateWeekdayRecurringDto): Response<List<ScheduleResponseDto>> = api.createWeekdayRecurring(request)
+
+    suspend fun getScheduleById(id: Long): ScheduleResponseDto = api.getScheduleById(id)
 }
