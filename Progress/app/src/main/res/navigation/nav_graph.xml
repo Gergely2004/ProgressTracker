@@ -36,5 +36,10 @@
     <fragment android:id="@+id/scheduleDetailsFragment" android:name="com.example.progress.ui.schedule.ScheduleDetailsFragment"
         android:label="fragment_schedule_details" tools:layout="@layout/fragment_schedule_details">
         <argument android:name="scheduleId" app:argType="long" />
+        <action android:id="@+id/action_scheduleDetailsFragment_to_editScheduleFragment" app:destination="@id/editScheduleFragment" />
+    </fragment>
+    <fragment android:id="@+id/editScheduleFragment" android:name="com.example.progress.ui.schedule.EditScheduleFragment"
+        android:label="fragment_edit_schedule" tools:layout="@layout/fragment_edit_schedule">
+        <argument android:name="scheduleId" app:argType="long" />
     </fragment>
 </navigation>

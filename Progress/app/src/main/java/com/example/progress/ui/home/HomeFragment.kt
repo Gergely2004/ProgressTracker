@@ -18,6 +18,7 @@ import com.example.progress.R
 import com.example.progress.databinding.FragmentHomeBinding
 import com.example.progress.model.CreateProgressDto
 import com.example.progress.model.ScheduleResponseDto
+import com.example.progress.model.UpdateScheduleDto
 import com.example.progress.repository.ProgressRepository
 import com.example.progress.repository.ScheduleRepository
 import kotlinx.coroutines.launch
@@ -40,6 +41,7 @@ class HomeFragment : Fragment() {
     private lateinit var viewModel: HomeViewModel
     private lateinit var adapter: HomeScheduleAdapter
     private lateinit var progressRepo: ProgressRepository
+    private lateinit var scheduleRepo: ScheduleRepository
 
     private var currentSchedules: List<ScheduleResponseDto> = emptyList()
     private val togglingIds = mutableSetOf<Long>()
@@ -50,6 +52,7 @@ class HomeFragment : Fragment() {
         val factory = HomeViewModelFactory(requireContext())
         viewModel = ViewModelProvider(this, factory) [HomeViewModel::class.java]
         progressRepo = ProgressRepository(requireContext())
+        scheduleRepo = ScheduleRepository(requireContext())
     }
 
     override fun onCreateView(
@@ -97,10 +100,11 @@ class HomeFragment : Fragment() {
 
                 val prevList = currentSchedules
                 val idx = prevList.indexOfFirst { it.id == sched.id }
+                var previousStatus = sched.status
                 if (idx >= 0) {
-                    val prev = prevList[idx]
+                    previousStatus = prevList[idx].status
                     val newStatus = if (markCompleted) "Completed" else "Planned"
-                    val updated = prev.copy(status = newStatus)
+                    val updated = prevList[idx].copy(status = newStatus)
                     val newList = prevList.toMutableList().apply { set(idx, updated) }
                     currentSchedules = newList
                     adapter.submitList(newList.toList())
@@ -108,20 +112,13 @@ class HomeFragment : Fragment() {
 
                 lifecycleScope.launch {
                     try {
-                        val dateParam = sched.date ?: LocalDate.now().toString()
-                        val dto = CreateProgressDto(
-                            scheduleId = sched.id,
-                            date = dateParam,
-                            loggedTime = 0.0,
-                            notes = null,
-                            isCompleted = markCompleted
-                        )
-                        val resp = progressRepo.createProgress(dto)
+                        val newStatus = if (markCompleted) "Completed" else "Planned"
+                        val resp = scheduleRepo.updateSchedule(sched.id, UpdateScheduleDto(status = newStatus))
                         if (!resp.isSuccessful) {
                             if (idx >= 0) {
-                                val rollbackList = currentSchedules.toMutableList().apply { set(idx, currentSchedules[idx].copy(status = sched.status)) }
-                                currentSchedules = rollbackList
-                                adapter.submitList(rollbackList.toList())
+                                val rollback = currentSchedules.toMutableList().apply { set(idx, currentSchedules[idx].copy(status = previousStatus)) }
+                                currentSchedules = rollback
+                                adapter.submitList(rollback.toList())
                             }
                             Toast.makeText(requireContext(), "Update failed ${resp.code()}", Toast.LENGTH_SHORT).show()
                         } else {
@@ -129,9 +126,9 @@ class HomeFragment : Fragment() {
                         }
                     } catch (e: Exception) {
                         if (idx >= 0) {
-                            val rollbackList = currentSchedules.toMutableList().apply { set(idx, currentSchedules[idx].copy(status = sched.status)) }
-                            currentSchedules = rollbackList
-                            adapter.submitList(rollbackList.toList())
+                            val rollback = currentSchedules.toMutableList().apply { set(idx, currentSchedules[idx].copy(status = previousStatus)) }
+                            currentSchedules = rollback
+                            adapter.submitList(rollback.toList())
                         }
                         Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     } finally {

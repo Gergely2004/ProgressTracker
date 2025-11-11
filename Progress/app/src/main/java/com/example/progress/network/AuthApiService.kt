@@ -11,12 +11,14 @@ import com.example.progress.model.CreateWeekdayRecurringDto
 import com.example.progress.model.HabitCategory
 import com.example.progress.model.CreateProgressDto
 import com.example.progress.model.ProgressResponseDto
+import com.example.progress.model.UpdateScheduleDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 import retrofit2.http.Path
+import retrofit2.http.PATCH
 
 interface ApiService {
 
@@ -52,4 +54,7 @@ interface ApiService {
 
     @GET("/schedule/{id}")
     suspend fun getScheduleById(@Path("id") id: Long): ScheduleResponseDto
+
+    @PATCH("/schedule/{id}")
+    suspend fun updateSchedule(@Path("id") id: Long, @Body request: UpdateScheduleDto): Response<ScheduleResponseDto>
 }

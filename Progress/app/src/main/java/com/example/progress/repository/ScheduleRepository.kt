@@ -6,6 +6,7 @@ import com.example.progress.model.CreateRecurringScheduleDto
 import com.example.progress.model.CreateWeekdayRecurringDto
 import com.example.progress.model.HabitResponseDto
 import com.example.progress.model.ScheduleResponseDto
+import com.example.progress.model.UpdateScheduleDto
 import com.example.progress.network.RetrofitClient
 import retrofit2.Response
 
@@ -25,4 +26,5 @@ class ScheduleRepository(context: Context) {
     suspend fun createWeekdayRecurringSchedule(request: CreateWeekdayRecurringDto): Response<List<ScheduleResponseDto>> = api.createWeekdayRecurring(request)
 
     suspend fun getScheduleById(id: Long): ScheduleResponseDto = api.getScheduleById(id)
+    suspend fun updateSchedule(id: Long, request: UpdateScheduleDto) = api.updateSchedule(id, request)
 }

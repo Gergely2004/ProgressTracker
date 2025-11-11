@@ -6,11 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.progress.databinding.FragmentScheduleDetailsBinding
 import com.example.progress.model.ProgressResponseDto
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 class ScheduleDetailsFragment: Fragment() {
     private var _binding: FragmentScheduleDetailsBinding? = null
@@ -31,6 +33,10 @@ class ScheduleDetailsFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val scheduleId = arguments?.getLong("scheduleId") ?: return
+        binding.btnEditSchedule.setOnClickListener {
+            val bundle = Bundle().apply { putLong("scheduleId", scheduleId) }
+            findNavController().navigate(com.example.progress.R.id.action_scheduleDetailsFragment_to_editScheduleFragment, bundle)
+        }
         setupRecycler()
         observe()
         viewModel.load(scheduleId)
@@ -59,7 +65,7 @@ class ScheduleDetailsFragment: Fragment() {
             if (total > 0) {
                 val percent = (completed * 100 / total)
                 binding.progressBar.progress = percent
-                binding.tvProgressPercent.text = "$percent%"
+                binding.tvProgressPercent.text = String.format(Locale.getDefault(), "%d%%", percent)
             } else {
                 binding.progressBar.progress = if (sched.status?.equals("completed", true) == true) 100 else 0
                 binding.tvProgressPercent.text = if (sched.status?.equals("completed", true) == true) "100%" else "0%"
@@ -96,4 +102,3 @@ private class Diff: androidx.recyclerview.widget.DiffUtil.ItemCallback<ProgressR
     override fun areItemsTheSame(oldItem: ProgressResponseDto, newItem: ProgressResponseDto) = oldItem.id == newItem.id
     override fun areContentsTheSame(oldItem: ProgressResponseDto, newItem: ProgressResponseDto) = oldItem == newItem
 }
-
