@@ -24,7 +24,6 @@ object RetrofitClient {
             .addInterceptor(AuthInterceptor(context.applicationContext))
             .addInterceptor(logging)
             .build()
-        // Configure Gson to handle java.time.LocalDateTime <-> ISO strings
         val formatter = DateTimeFormatter.ISO_DATE_TIME
 
         val localDateTimeDeserializer = JsonDeserializer { json, typeOfT, contextGson ->
@@ -32,7 +31,6 @@ object RetrofitClient {
                 if (json == null || json.asString == null) return@JsonDeserializer null
                 LocalDateTime.parse(json.asString, formatter)
             } catch (e: Exception) {
-                // Fallback: try to parse as plain date/time without offset
                 try {
                     LocalDateTime.parse(json.asString)
                 } catch (ex: Exception) {

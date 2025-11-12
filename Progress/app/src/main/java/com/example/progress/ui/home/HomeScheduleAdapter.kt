@@ -50,9 +50,9 @@ class HomeScheduleAdapter(
                 else -> "Planned"
             }
             val statusColor = when (status.lowercase()) {
-                "completed" -> 0xFF2E7D32.toInt() // green
-                "skipped" -> 0xFFC62828.toInt() // red
-                else -> 0xFF616161.toInt() // grey
+                "completed" -> 0xFF2E7D32.toInt()
+                "skipped" -> 0xFFC62828.toInt()
+                else -> 0xFF616161.toInt()
             }
             binding.tvStatus.setTextColor(statusColor)
 
@@ -61,7 +61,6 @@ class HomeScheduleAdapter(
 
             binding.cbDone.setOnCheckedChangeListener(null)
             binding.cbDone.isChecked = status.equals("completed", ignoreCase = true)
-            // Disable during in-flight handled by adapter: set in onBind
         }
         fun bindToggle(item: ScheduleResponseDto, onToggle: (ScheduleResponseDto, Boolean) -> Unit) {
             binding.cbDone.setOnCheckedChangeListener { _, isChecked ->

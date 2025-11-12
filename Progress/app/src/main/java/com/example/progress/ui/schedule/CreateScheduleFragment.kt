@@ -25,7 +25,6 @@ class CreateScheduleFragment : Fragment() {
 
     private lateinit var viewModel: CreateScheduleViewModel
 
-    // Hold picked values to build proper ISO strings
     private var pickedDate: LocalDate? = null
     private var pickedStartHour: Int? = null
     private var pickedStartMinute: Int? = null

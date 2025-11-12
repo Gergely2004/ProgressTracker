@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.progress.databinding.FragmentScheduleDetailsBinding
 import com.example.progress.model.ProgressResponseDto
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 class ScheduleDetailsFragment: Fragment() {
@@ -38,6 +37,7 @@ class ScheduleDetailsFragment: Fragment() {
             findNavController().navigate(com.example.progress.R.id.action_scheduleDetailsFragment_to_editScheduleFragment, bundle)
         }
         setupRecycler()
+        setupNotesEditing(scheduleId)
         observe()
         viewModel.load(scheduleId)
     }
@@ -47,6 +47,31 @@ class ScheduleDetailsFragment: Fragment() {
         binding.rvProgressHistory.layoutManager = LinearLayoutManager(requireContext())
         binding.rvProgressHistory.adapter = adapter
         binding.rvProgressHistory.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
+    }
+
+    private fun setupNotesEditing(scheduleId: Long) {
+        binding.btnEditNotes.setOnClickListener {
+            binding.tilNotes.visibility = View.VISIBLE
+            binding.notesEditActions.visibility = View.VISIBLE
+            binding.tvNotes.visibility = View.GONE
+            binding.btnEditNotes.visibility = View.GONE
+            binding.etNotes.setText(binding.tvNotes.text ?: "")
+        }
+        binding.btnCancelNotes.setOnClickListener {
+            binding.tilNotes.visibility = View.GONE
+            binding.notesEditActions.visibility = View.GONE
+            binding.tvNotes.visibility = View.VISIBLE
+            binding.btnEditNotes.visibility = View.VISIBLE
+        }
+        binding.btnSaveNotes.setOnClickListener {
+            val text = binding.etNotes.text?.toString() ?: ""
+            viewModel.updateNotes(scheduleId, text)
+            binding.tvNotes.text = text
+            binding.tilNotes.visibility = View.GONE
+            binding.notesEditActions.visibility = View.GONE
+            binding.tvNotes.visibility = View.VISIBLE
+            binding.btnEditNotes.visibility = View.VISIBLE
+        }
     }
 
     private fun observe() {
@@ -59,7 +84,6 @@ class ScheduleDetailsFragment: Fragment() {
             binding.tvNotes.text = sched.notes ?: ""
             val progresses = sched.progress ?: emptyList()
             adapter.submitList(progresses.sortedBy { it.date })
-            // Progress bar: percent completed entries
             val total = progresses.size
             val completed = progresses.count { it.isCompleted }
             if (total > 0) {
@@ -70,7 +94,7 @@ class ScheduleDetailsFragment: Fragment() {
                 binding.progressBar.progress = if (sched.status?.equals("completed", true) == true) 100 else 0
                 binding.tvProgressPercent.text = if (sched.status?.equals("completed", true) == true) "100%" else "0%"
             }
-            binding.groupNotes.visibility = if (sched.notes.isNullOrBlank()) View.GONE else View.VISIBLE
+            binding.groupNotes.visibility = View.VISIBLE
         }
     }
 
@@ -89,7 +113,6 @@ private class ProgressHistoryAdapter: androidx.recyclerview.widget.ListAdapter<P
     override fun onBindViewHolder(holder: ProgressVH, position: Int) { holder.bind(getItem(position)) }
 }
 private class ProgressVH(private val binding: com.example.progress.databinding.ItemProgressEntryBinding): androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
-    private val fmtDate = DateTimeFormatter.ISO_LOCAL_DATE
     fun bind(item: ProgressResponseDto) {
         binding.tvDate.text = item.date
         binding.tvLoggedTime.text = item.loggedTime.toString()

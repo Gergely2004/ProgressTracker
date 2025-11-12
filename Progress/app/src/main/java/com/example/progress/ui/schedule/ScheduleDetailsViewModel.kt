@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.progress.model.ScheduleResponseDto
+import com.example.progress.model.UpdateScheduleDto
 import com.example.progress.repository.ScheduleRepository
 import kotlinx.coroutines.launch
 
@@ -28,6 +29,26 @@ class ScheduleDetailsViewModel(app: Application): AndroidViewModel(app) {
                 val sched = repo.getScheduleById(id)
                 _schedule.postValue(sched)
                 _error.postValue(null)
+            } catch (e: Exception) {
+                _error.postValue(e.message)
+            } finally {
+                _loading.postValue(false)
+            }
+        }
+    }
+
+    fun updateNotes(id: Long, notes: String) {
+        _loading.postValue(true)
+        viewModelScope.launch {
+            try {
+                val res = repo.updateSchedule(id, UpdateScheduleDto(notes = notes))
+                if (res.isSuccessful) {
+                    val sched = repo.getScheduleById(id)
+                    _schedule.postValue(sched)
+                    _error.postValue(null)
+                } else {
+                    _error.postValue("Failed to update notes: ${res.code()} ${res.message()}")
+                }
             } catch (e: Exception) {
                 _error.postValue(e.message)
             } finally {
