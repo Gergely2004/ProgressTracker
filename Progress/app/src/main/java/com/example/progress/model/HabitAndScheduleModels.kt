@@ -23,6 +23,7 @@ data class ScheduleResponseDto(
     val notes: String? = null,
     val participants: List<ParticipantDto>? = emptyList(),
     val habit: HabitResponseDto? = null,
+    @SerializedName(value = "progress")
     val progress: List<ProgressResponseDto>? = emptyList(),
     val isParticipantOnly: Boolean,
 )

@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonSerializer
 import com.google.gson.JsonPrimitive
+import com.google.gson.internal.GsonBuildConfig
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.lang.reflect.Type
@@ -26,7 +27,7 @@ object RetrofitClient {
             .build()
         val formatter = DateTimeFormatter.ISO_DATE_TIME
 
-        val localDateTimeDeserializer = JsonDeserializer { json, typeOfT, contextGson ->
+        val localDateTimeDeserializer = JsonDeserializer { json, _, _ ->
             try {
                 if (json == null || json.asString == null) return@JsonDeserializer null
                 LocalDateTime.parse(json.asString, formatter)
@@ -39,7 +40,7 @@ object RetrofitClient {
             }
         }
 
-        val localDateTimeSerializer = JsonSerializer<LocalDateTime> { src, typeOfSrc, contextGson ->
+        val localDateTimeSerializer = JsonSerializer<LocalDateTime> { src, _, _ ->
             try {
                 JsonPrimitive(src.format(formatter))
             } catch (e: Exception) {

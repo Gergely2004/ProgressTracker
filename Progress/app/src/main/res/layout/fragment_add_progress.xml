@@ -13,11 +13,10 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Schedule ID"
-            app:endIconMode="dropdown_menu"
+            android:hint="@string/hint_date"
             app:boxBackgroundMode="filled">
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                android:id="@+id/actScheduleId"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </com.google.android.material.textfield.TextInputLayout>
@@ -25,20 +24,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Date (YYYY-MM-DD)"
-            android:layout_marginTop="8dp"
-            app:boxBackgroundMode="filled">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etDate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="2025-11-09"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Logged time (minutes)"
+            android:hint="@string/hint_logged_time"
             android:layout_marginTop="8dp"
             app:boxBackgroundMode="filled">
             <com.google.android.material.textfield.TextInputEditText
@@ -52,13 +38,13 @@
             android:id="@+id/cbCompleted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mark as completed"
+            android:text="@string/checkbox_mark_completed"
             android:layout_marginTop="8dp"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Notes (optional)"
+            android:hint="@string/hint_notes_optional"
             android:layout_marginTop="8dp"
             app:boxBackgroundMode="filled">
             <com.google.android.material.textfield.TextInputEditText
@@ -74,8 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Add Progress"/>
+            android:text="@string/add_progress"/>
 
     </LinearLayout>
 </ScrollView>
-

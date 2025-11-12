@@ -6,4 +6,27 @@
     <!-- Strings used by HomeScheduleAdapter -->
     <string name="unknown_habit">Unknown Habit</string>
     <string name="unknown_time">-</string>
+
+    <!-- Action labels -->
+    <string name="add_habit">Add habit</string>
+    <string name="create_schedule">Create schedule</string>
+    <string name="add_progress">Add Progress</string>
+    <string name="edit">Edit</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Field hints / labels -->
+    <string name="hint_date">Date (YYYY-MM-DD)</string>
+    <string name="hint_logged_time">Logged time (minutes)</string>
+    <string name="hint_notes_optional">Notes (optional)</string>
+    <string name="notes_label">Notes</string>
+    <string name="checkbox_mark_completed">Mark as completed</string>
+    <string name="notes_type_here">Type notes...</string>
+
+    <!-- Toast / messages -->
+    <string name="missing_schedule_id">Missing schedule id</string>
+    <string name="progress_saved">Progress saved</string>
+    <string name="progress_failed">Failed: %1$s</string>
+    <string name="select_schedule_id">Select a scheduleId</string>
+    <string name="invalid_logged_time">Enter a positive logged time</string>
 </resources>

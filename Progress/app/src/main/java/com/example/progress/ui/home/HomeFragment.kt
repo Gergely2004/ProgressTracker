@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.progress.R
 import com.example.progress.databinding.FragmentHomeBinding
-import com.example.progress.model.CreateProgressDto
 import com.example.progress.model.ScheduleResponseDto
 import com.example.progress.model.UpdateScheduleDto
 import com.example.progress.repository.ProgressRepository

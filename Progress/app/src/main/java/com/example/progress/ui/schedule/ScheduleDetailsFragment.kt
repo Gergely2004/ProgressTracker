@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -36,10 +37,15 @@ class ScheduleDetailsFragment: Fragment() {
             val bundle = Bundle().apply { putLong("scheduleId", scheduleId) }
             findNavController().navigate(com.example.progress.R.id.action_scheduleDetailsFragment_to_editScheduleFragment, bundle)
         }
+        binding.btnAddProgress.setOnClickListener {
+            val bundle = Bundle().apply { putLong("scheduleId", scheduleId) }
+            findNavController().navigate(com.example.progress.R.id.addProgressFragment, bundle)
+        }
         setupRecycler()
         setupNotesEditing(scheduleId)
         observe()
         viewModel.load(scheduleId)
+
     }
 
     private fun setupRecycler() {

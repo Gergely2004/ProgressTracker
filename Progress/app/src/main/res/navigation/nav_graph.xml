@@ -10,7 +10,6 @@
         <action android:id="@+id/action_homeFragment_to_createScheduleFragment" app:destination="@id/createScheduleFragment"/>
         <action android:id="@+id/action_homeFragment_to_createScheduleFragment2"
                 app:destination="@id/createScheduleFragment"/>
-        <action android:id="@+id/action_homeFragment_to_addProgressFragment" app:destination="@id/addProgressFragment"/>
         <action android:id="@+id/action_homeFragment_to_scheduleDetailsFragment" app:destination="@id/scheduleDetailsFragment" />
     </fragment>
     <fragment android:id="@+id/loginFragment" android:name="com.example.progress.ui.auth.LoginFragment"
