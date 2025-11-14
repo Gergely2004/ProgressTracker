@@ -27,4 +27,5 @@ class ScheduleRepository(context: Context) {
 
     suspend fun getScheduleById(id: Long): ScheduleResponseDto = api.getScheduleById(id)
     suspend fun updateSchedule(id: Long, request: UpdateScheduleDto) = api.updateSchedule(id, request)
+    suspend fun deleteSchedule(id: Long) = api.deleteSchedule(id)
 }

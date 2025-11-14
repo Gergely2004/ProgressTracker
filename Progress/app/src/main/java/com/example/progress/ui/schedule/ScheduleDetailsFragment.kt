@@ -4,14 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.progress.R
 import com.example.progress.databinding.FragmentScheduleDetailsBinding
 import com.example.progress.model.ProgressResponseDto
+import com.google.android.material.snackbar.Snackbar
 import java.util.*
 
 class ScheduleDetailsFragment: Fragment() {
@@ -35,11 +37,14 @@ class ScheduleDetailsFragment: Fragment() {
         val scheduleId = arguments?.getLong("scheduleId") ?: return
         binding.btnEditSchedule.setOnClickListener {
             val bundle = Bundle().apply { putLong("scheduleId", scheduleId) }
-            findNavController().navigate(com.example.progress.R.id.action_scheduleDetailsFragment_to_editScheduleFragment, bundle)
+            findNavController().navigate(R.id.action_scheduleDetailsFragment_to_editScheduleFragment, bundle)
         }
         binding.btnAddProgress.setOnClickListener {
             val bundle = Bundle().apply { putLong("scheduleId", scheduleId) }
-            findNavController().navigate(com.example.progress.R.id.addProgressFragment, bundle)
+            findNavController().navigate(R.id.addProgressFragment, bundle)
+        }
+        binding.btnDeleteSchedule.setOnClickListener {
+            showDeleteConfirmationDialog(scheduleId)
         }
         setupRecycler()
         setupNotesEditing(scheduleId)
@@ -102,6 +107,30 @@ class ScheduleDetailsFragment: Fragment() {
             }
             binding.groupNotes.visibility = View.VISIBLE
         }
+
+        viewModel.deleteSuccess.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                Snackbar.make(binding.root, "Schedule deleted successfully", Snackbar.LENGTH_SHORT).show()
+                findNavController().navigateUp()
+            }
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun showDeleteConfirmationDialog(scheduleId: Long) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.delete_schedule_title)
+            .setMessage(R.string.delete_schedule_message)
+            .setPositiveButton(R.string.yes) { _, _ ->
+                viewModel.deleteSchedule(scheduleId)
+            }
+            .setNegativeButton(R.string.no, null)
+            .show()
     }
 
     override fun onDestroyView() {

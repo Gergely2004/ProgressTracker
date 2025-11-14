@@ -246,7 +246,7 @@
                     android:text="@string/edit" />
 
                 <Space
-                    android:layout_width="12dp"
+                    android:layout_width="8dp"
                     android:layout_height="1dp" />
 
                 <Button
@@ -255,6 +255,19 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/add_progress" />
+
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="1dp" />
+
+                <Button
+                    android:id="@+id/btnDeleteSchedule"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/delete"
+                    android:textColor="@android:color/holo_red_dark" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

@@ -19,6 +19,7 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 import retrofit2.http.Path
 import retrofit2.http.PATCH
+import retrofit2.http.DELETE
 
 interface ApiService {
 
@@ -57,4 +58,7 @@ interface ApiService {
 
     @PATCH("/schedule/{id}")
     suspend fun updateSchedule(@Path("id") id: Long, @Body request: UpdateScheduleDto): Response<ScheduleResponseDto>
+
+    @DELETE("/schedule/{id}")
+    suspend fun deleteSchedule(@Path("id") id: Long): Response<Unit>
 }
