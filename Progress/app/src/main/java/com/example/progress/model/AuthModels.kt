@@ -10,7 +10,9 @@ data class User(
 data class AuthRequest(
     val email: String,
     val password: String,
-    val username: String? = null // only used in signup
+    val username: String? = null, // only used in signup
+    val profileImageBase64: String? = null, // profile image for signup
+    val description: String? = null // user description for signup
 )
 data class Tokens(
     val accessToken: String,

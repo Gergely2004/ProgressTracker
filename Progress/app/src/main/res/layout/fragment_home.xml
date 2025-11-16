@@ -4,14 +4,26 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
-             tools:context="com.example.progress.ui.home.HomeFragment">
+             tools:context="com.example.progress.ui.home.HomeFragment"
+             android:padding="60dp">
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvSchedules"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp"
+            android:paddingTop="60dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Profile"
+        android:src="@android:drawable/ic_menu_myplaces"
+        app:tint="@android:color/white"
+        app:fabSize="mini"
+        android:layout_margin="16dp"
+        android:layout_gravity="top|end" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddHabit"

@@ -12,6 +12,7 @@ import com.example.progress.model.HabitCategory
 import com.example.progress.model.CreateProgressDto
 import com.example.progress.model.ProgressResponseDto
 import com.example.progress.model.UpdateScheduleDto
+import com.example.progress.model.ProfileResponseDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -28,6 +29,9 @@ interface ApiService {
 
     @POST("/auth/local/signup")
     suspend fun signup(@Body request: AuthRequest): Response<AuthResponseDto>
+
+    @GET("/profile")
+    suspend fun getProfile(): ProfileResponseDto
 
     @GET("/schedule/day")
     suspend fun getScheduleByDay(@Query("date") day: String): List<ScheduleResponseDto>
