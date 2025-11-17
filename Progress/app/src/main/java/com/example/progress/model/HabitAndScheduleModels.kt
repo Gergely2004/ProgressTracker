@@ -35,9 +35,9 @@ data class HabitResponseDto (
     val category: HabitCategory,
     val goal: String,
     @SerializedName("created_at")
-    val createdAt: LocalDateTime,
+    val createdAt: String,
     @SerializedName("updated_at")
-    val updatedAt: LocalDateTime
+    val updatedAt: String
 )
 
 data class HabitCategory (

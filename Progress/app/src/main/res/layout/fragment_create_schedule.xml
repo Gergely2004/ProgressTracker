@@ -12,7 +12,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Habit selection/creation card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,7 +40,6 @@
                     android:text="Use existing habit"
                     android:layout_marginBottom="12dp"/>
 
-                <!-- Existing habit dropdown -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilHabit"
                     android:layout_width="match_parent"
@@ -57,7 +55,6 @@
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- New habit fields -->
                 <LinearLayout
                     android:id="@+id/groupNewHabit"
                     android:layout_width="match_parent"
@@ -116,12 +113,10 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Spacing between cards -->
         <Space
             android:layout_width="0dp"
             android:layout_height="16dp"/>
 
-        <!-- Schedule details card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -143,7 +138,6 @@
                     android:textSize="18sp"
                     android:layout_marginBottom="12dp"/>
 
-                <!-- Schedule type toggle -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -177,7 +171,6 @@
                         android:text="Recurring" />
                 </com.google.android.material.button.MaterialButtonToggleGroup>
 
-                <!-- Custom date and time -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilDate"
                     android:layout_width="match_parent"
@@ -189,7 +182,6 @@
                         android:id="@+id/etDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="2025-11-04"
                         android:inputType="date"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -197,18 +189,16 @@
                     android:id="@+id/tilStartTimeCustom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Start time (ISO 8601)"
+                    android:hint="Start time (HH:MM)"
                     app:boxBackgroundMode="filled"
                     android:layout_marginTop="8dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etStartTimeCustom"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="YYYY-MM-DDThh:mm:ss"
                         android:inputType="datetime"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Recurring time only -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilStartTimeRecurring"
                     android:layout_width="match_parent"
@@ -221,11 +211,9 @@
                         android:id="@+id/etStartTimeRecurring"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="08:00"
                         android:inputType="time"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Repeat pattern dropdown -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilRepeat"
                     android:layout_width="match_parent"
@@ -242,7 +230,6 @@
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Weekday selection chips -->
                 <LinearLayout
                     android:id="@+id/weekdayContainer"
                     android:layout_width="match_parent"
@@ -369,7 +356,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Actions -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

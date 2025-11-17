@@ -27,3 +27,12 @@ data class ProfileResponseDto(
     val updatedAt: String
 )
 
+data class UpdateProfileDto(
+    @SerializedName("username")
+    val username: String? = null,
+    @SerializedName("description")
+    val description: String? = null,
+    @SerializedName("profileImageBase64")
+    val profileImageBase64: String? = null
+)
+

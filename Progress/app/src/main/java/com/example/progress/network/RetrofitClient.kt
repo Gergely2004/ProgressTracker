@@ -9,13 +9,14 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonSerializer
 import com.google.gson.JsonPrimitive
-import com.google.gson.internal.GsonBuildConfig
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.lang.reflect.Type
+import java.time.Instant
+import java.time.ZoneOffset
 
 object RetrofitClient {
-    private const val BASE_URL = "http://10.0.2.2:8080"
+    private const val BASE_URL = "http://10.0.2.2:8080/"
+
     fun getInstance(context: Context): ApiService {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -29,12 +30,18 @@ object RetrofitClient {
 
         val localDateTimeDeserializer = JsonDeserializer { json, _, _ ->
             try {
-                if (json == null || json.asString == null) return@JsonDeserializer null
-                LocalDateTime.parse(json.asString, formatter)
-            } catch (e: Exception) {
+                val str = json?.asString
+                if (str.isNullOrBlank()) return@JsonDeserializer null
+                return@JsonDeserializer LocalDateTime.parse(str, formatter)
+            } catch (_: Exception) {
                 try {
-                    LocalDateTime.parse(json.asString)
-                } catch (ex: Exception) {
+                    val str = json?.asString
+                    if (str.isNullOrBlank()) return@JsonDeserializer null
+                    val instant = try { Instant.parse(str) } catch (_: Exception) {
+                        java.time.OffsetDateTime.parse(str, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant()
+                    }
+                    LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
+                } catch (_: Exception) {
                     null
                 }
             }
@@ -43,7 +50,7 @@ object RetrofitClient {
         val localDateTimeSerializer = JsonSerializer<LocalDateTime> { src, _, _ ->
             try {
                 JsonPrimitive(src.format(formatter))
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 JsonPrimitive(src.toString())
             }
         }

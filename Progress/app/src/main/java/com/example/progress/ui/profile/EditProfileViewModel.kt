@@ -5,27 +5,25 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.progress.model.HabitResponseDto
 import com.example.progress.model.ProfileResponseDto
+import com.example.progress.model.UpdateProfileDto
 import com.example.progress.repository.ProfileRepository
-import com.example.progress.repository.HabitRepository
 import kotlinx.coroutines.launch
 
-class ProfileViewModel(app: Application) : AndroidViewModel(app) {
+class EditProfileViewModel(app: Application) : AndroidViewModel(app) {
     private val repo = ProfileRepository(app)
-    private val habitRepo = HabitRepository(app)
 
     private val _profile = MutableLiveData<ProfileResponseDto?>()
     val profile: LiveData<ProfileResponseDto?> = _profile
-
-    private val _habits = MutableLiveData<List<HabitResponseDto>>()
-    val habits: LiveData<List<HabitResponseDto>> = _habits
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
+
+    private val _updateSuccess = MutableLiveData<Boolean>()
+    val updateSuccess: LiveData<Boolean> = _updateSuccess
 
     init {
         _isLoading.value = false
@@ -39,7 +37,6 @@ class ProfileViewModel(app: Application) : AndroidViewModel(app) {
                 _error.value = null
                 val profileResponse = repo.getProfile()
                 _profile.value = profileResponse
-                loadHabitsByUser(profileResponse.id)
             } catch (e: Exception) {
                 _error.value = e.message ?: "Failed to load profile"
                 _profile.value = null
@@ -49,27 +46,28 @@ class ProfileViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun loadHabitsByUser(userId: Long) {
+    fun updateProfile(username: String) {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
                 _error.value = null
-                val habitsList = habitRepo.listHabitsByUser(userId)
-                _habits.value = habitsList
+                _updateSuccess.value = false
+
+                val updateDto = UpdateProfileDto(username = username.trim())
+                val response = repo.updateProfile(updateDto)
+
+                if (response.isSuccessful) {
+                    _profile.value = response.body()
+                    _updateSuccess.value = true
+                } else {
+                    _error.value = "Failed to update profile: ${response.code()}"
+                }
             } catch (e: Exception) {
-                _error.value = e.message ?: "Failed to load habits"
-                _habits.value = emptyList()
+                _error.value = e.message ?: "Failed to update profile"
             } finally {
                 _isLoading.value = false
             }
         }
     }
-
-    fun refreshHabits() {
-        _profile.value?.id?.let { loadHabitsByUser(it) }
-    }
-
-    @Suppress("unused")
-    fun logout() {
-    }
 }
+

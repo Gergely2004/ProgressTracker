@@ -41,10 +41,6 @@ class ProfileFragment : Fragment() {
         setupRecyclerView()
         setupObservers()
         setupListeners()
-
-        // Load profile and habits
-        viewModel.loadProfile()
-        viewModel.loadHabits()
     }
 
     private fun setupRecyclerView() {
@@ -89,6 +85,10 @@ class ProfileFragment : Fragment() {
             findNavController().navigate(R.id.action_profileFragment_to_addHabitFragment)
         }
 
+        binding.editProfileButton.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+        }
+
         binding.logoutButton.setOnClickListener {
             showLogoutConfirmationDialog()
         }
@@ -98,7 +98,6 @@ class ProfileFragment : Fragment() {
         binding.usernameTextView.text = profile.username
         binding.emailTextView.text = profile.email
 
-        // Display description if available
         profile.description?.let {
             binding.descriptionTextView.text = it
             binding.descriptionTextView.visibility = View.VISIBLE
@@ -106,17 +105,17 @@ class ProfileFragment : Fragment() {
             binding.descriptionTextView.visibility = View.GONE
         }
 
-        // Format and display join date
         try {
             val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
             val date = formatter.parse(profile.createdAt)
             val displayFormatter = SimpleDateFormat("MMM yyyy", Locale.getDefault())
-            binding.joinDateTextView.text = "Joined: ${displayFormatter.format(date)}"
-        } catch (e: Exception) {
-            binding.joinDateTextView.text = "Joined: ${profile.createdAt}"
+            val joinedValue = date?.let { displayFormatter.format(it) } ?: profile.createdAt
+            val joinedText = getString(R.string.profile_joined_label, joinedValue)
+            binding.joinDateTextView.text = joinedText
+        } catch (_: Exception) {
+            binding.joinDateTextView.text = getString(R.string.profile_joined_label, profile.createdAt)
         }
 
-        // Load profile image
         profile.profileImageUrl?.let { url ->
             binding.profileImageView.load(url) {
                 placeholder(android.R.drawable.ic_menu_myplaces)
@@ -128,12 +127,10 @@ class ProfileFragment : Fragment() {
                 val imageBytes = Base64.decode(base64, Base64.DEFAULT)
                 val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                 binding.profileImageView.setImageBitmap(bitmap)
-            } catch (e: Exception) {
-                // Keep default image
+            } catch (_: Exception) {
             }
         }
 
-        // Load cover image
         profile.coverImageUrl?.let { url ->
             binding.coverImageView.load(url) {
                 placeholder(android.R.color.darker_gray)
@@ -144,22 +141,29 @@ class ProfileFragment : Fragment() {
 
     private fun showLogoutConfirmationDialog() {
         AlertDialog.Builder(requireContext())
-            .setTitle("Logout")
-            .setMessage("Are you sure you want to logout?")
-            .setPositiveButton("Yes") { _, _ ->
+            .setTitle(getString(R.string.profile_logout_title))
+            .setMessage(getString(R.string.profile_logout_message))
+            .setPositiveButton(R.string.yes) { _, _ ->
                 performLogout()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.no, null)
             .show()
     }
 
     private fun performLogout() {
-        // Clear stored token
         val sharedPreferences = requireContext().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         sharedPreferences.edit().remove("access_token").apply()
 
-        // Navigate back to login
         findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (viewModel.profile.value == null) {
+            viewModel.loadProfile()
+        } else {
+            viewModel.profile.value?.id?.let { viewModel.loadHabitsByUser(it) }
+        }
     }
 
     override fun onDestroyView() {

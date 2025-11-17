@@ -17,4 +17,8 @@ class HabitRepository(context: Context) {
     suspend fun listHabitCategories(): List<HabitCategory> {
         return api.listHabitCategories()
     }
+
+    suspend fun listHabitsByUser(userId: Long): List<HabitResponseDto> {
+        return api.listHabitsByUser(userId)
+    }
 }
