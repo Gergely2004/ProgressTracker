@@ -14,10 +14,13 @@ import com.example.progress.model.ProgressResponseDto
 import com.example.progress.model.UpdateScheduleDto
 import com.example.progress.model.ProfileResponseDto
 import com.example.progress.model.UpdateProfileDto
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Query
 import retrofit2.http.Path
 import retrofit2.http.PATCH
@@ -36,6 +39,10 @@ interface ApiService {
 
     @PATCH("/profile")
     suspend fun updateProfile(@Body request: UpdateProfileDto): Response<ProfileResponseDto>
+
+    @Multipart
+    @POST("/profile/upload-profile-image")
+    suspend fun uploadProfileImage(@Part image: MultipartBody.Part): Response<ProfileResponseDto>
 
     @GET("/schedule/day")
     suspend fun getScheduleByDay(@Query("date") day: String): List<ScheduleResponseDto>

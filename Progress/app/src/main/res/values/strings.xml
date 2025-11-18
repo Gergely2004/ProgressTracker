@@ -43,4 +43,6 @@
     <string name="username_required">Username is required</string>
     <string name="profile_updated_success">Profile updated successfully</string>
     <string name="edit_profile_button">Edit Profile</string>
+    <string name="change_photo">Change photo</string>
+    <string name="profile_image">Profile image</string>
 </resources>

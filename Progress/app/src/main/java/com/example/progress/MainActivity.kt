@@ -33,8 +33,16 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
-
-        // Define top-level destinations for ActionBar
+        val isLoggedIn = intent.getBooleanExtra("IS_LOGGED_IN", false)
+        if (savedInstanceState == null) {
+            val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
+            if (isLoggedIn) {
+                navGraph.setStartDestination(R.id.homeFragment)
+            } else {
+                navGraph.setStartDestination(R.id.registerFragment)
+            }
+            navController.graph = navGraph
+        }
         val appBarConfiguration = AppBarConfiguration(
             setOf(R.id.homeFragment, R.id.profileFragment)
         )

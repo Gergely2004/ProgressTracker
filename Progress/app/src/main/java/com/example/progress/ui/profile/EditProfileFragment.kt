@@ -1,6 +1,7 @@
 package com.example.progress.ui.profile
 
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import androidx.fragment.app.Fragment
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import coil.load
@@ -20,6 +22,18 @@ class EditProfileFragment : Fragment() {
     private var _binding: FragmentEditProfileBinding? = null
     private val binding get() = _binding!!
     private val viewModel: EditProfileViewModel by viewModels()
+
+    private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let { selectedUri ->
+            try {
+                binding.profileImageView.setImageURI(selectedUri)
+                android.util.Log.d("EditProfile", "Image selected: $selectedUri")
+                viewModel.uploadProfileImage(selectedUri)
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), e.message ?: "Failed to process image", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +62,7 @@ class EditProfileFragment : Fragment() {
             binding.saveButton.isEnabled = !isLoading
             binding.cancelButton.isEnabled = !isLoading
             binding.usernameEditText.isEnabled = !isLoading
+            binding.changePhotoButton.isEnabled = !isLoading
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
@@ -59,7 +74,6 @@ class EditProfileFragment : Fragment() {
         viewModel.updateSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {
                 Toast.makeText(requireContext(), getString(R.string.profile_updated_success), Toast.LENGTH_SHORT).show()
-                findNavController().navigateUp()
             }
         }
     }
@@ -80,6 +94,14 @@ class EditProfileFragment : Fragment() {
         binding.cancelButton.setOnClickListener {
             findNavController().navigateUp()
         }
+
+        binding.changePhotoButton.setOnClickListener {
+            pickImage.launch("image/*")
+        }
+
+        binding.profileImageView.setOnClickListener {
+            pickImage.launch("image/*")
+        }
     }
 
     private fun displayProfile(profile: com.example.progress.model.ProfileResponseDto) {
@@ -92,12 +114,23 @@ class EditProfileFragment : Fragment() {
                 error(R.drawable.ic_profile)
                 transformations(CircleCropTransformation())
             }
-        } ?: profile.profileImageBase64?.let { base64 ->
+        } ?: profile.profileImageBase64?.let { base64String ->
             try {
-                val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                binding.profileImageView.setImageBitmap(bitmap)
+                val base64Data = if (base64String.startsWith("data:image")) {
+                    base64String.substringAfter("base64,", "")
+                } else {
+                    base64String
+                }
+
+                if (base64Data.isNotEmpty()) {
+                    val imageBytes = Base64.decode(base64Data, Base64.DEFAULT)
+                    val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                    binding.profileImageView.setImageBitmap(bitmap)
+                } else {
+                    binding.profileImageView.setImageResource(R.drawable.ic_profile)
+                }
             } catch (e: Exception) {
+                android.util.Log.e("EditProfile", "Failed to decode Base64 image", e)
                 binding.profileImageView.setImageResource(R.drawable.ic_profile)
             }
         } ?: run {
@@ -105,9 +138,9 @@ class EditProfileFragment : Fragment() {
         }
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
-

@@ -14,6 +14,7 @@ import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import com.example.progress.databinding.ActivitySplashBinding
+import com.example.progress.utils.SessionManager
 
 class SplashActivity : AppCompatActivity() {
 
@@ -59,7 +60,6 @@ class SplashActivity : AppCompatActivity() {
             startDelay = 300
             interpolator = DecelerateInterpolator()
         }
-
         val appNameFadeIn = ObjectAnimator.ofFloat(binding.tvAppName, View.ALPHA, 0f, 1f).apply {
             duration = 1000
             startDelay = 300
@@ -98,7 +98,10 @@ class SplashActivity : AppCompatActivity() {
 
         fadeOut.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
+                val sessionManager = SessionManager(this@SplashActivity)
+                val isLoggedIn = sessionManager.isLoggedIn()
                 val intent = Intent(this@SplashActivity, MainActivity::class.java)
+                intent.putExtra("IS_LOGGED_IN", isLoggedIn)
                 startActivity(intent)
                 finish()
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
