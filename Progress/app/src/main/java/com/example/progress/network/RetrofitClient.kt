@@ -30,6 +30,7 @@ object RetrofitClient {
 
         val localDateTimeDeserializer = JsonDeserializer { json, _, _ ->
             try {
+
                 val str = json?.asString
                 if (str.isNullOrBlank()) return@JsonDeserializer null
                 return@JsonDeserializer LocalDateTime.parse(str, formatter)

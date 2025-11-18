@@ -5,12 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
+import android.widget.AdapterView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import coil.load
+import com.example.progress.R
 import com.example.progress.databinding.FragmentCreateScheduleBinding
 import com.example.progress.model.HabitResponseDto
+import com.example.progress.model.HabitCategory
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -28,6 +34,9 @@ class CreateScheduleFragment : Fragment() {
     private var pickedDate: LocalDate? = null
     private var pickedStartHour: Int? = null
     private var pickedStartMinute: Int? = null
+
+    private var categories: List<HabitCategory> = emptyList()
+    private var selectedCategoryId: Long? = null
 
     private val isoDateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
     private val isoDateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
@@ -54,6 +63,7 @@ class CreateScheduleFragment : Fragment() {
         setupPickers()
         setupObservers()
         viewModel.loadHabits()
+        viewModel.loadCategories()
     }
 
     private fun isRecurringSelected(): Boolean = binding.scheduleTypeGroup.checkedButtonId == binding.btnTypeRecurring.id
@@ -134,10 +144,19 @@ class CreateScheduleFragment : Fragment() {
             } else {
                 val name = binding.etHabitName.text?.toString()?.trim().orEmpty()
                 val description = binding.etHabitDescription.text?.toString()?.trim()?.ifEmpty { null }
-                val categoryId = binding.etCategoryId.text?.toString()?.toLongOrNull()
                 val goal = binding.etHabitGoal.text?.toString()?.trim().orEmpty()
+
+                if (selectedCategoryId == null) {
+                    val typed = binding.actCategory.text?.toString()?.trim().orEmpty()
+                    if (typed.isNotEmpty()) {
+                        selectedCategoryId = categories.firstOrNull { it.name == typed }?.id
+                    }
+                }
+
+                val categoryId = selectedCategoryId
                 if (name.isEmpty() || categoryId == null || goal.isEmpty()) {
-                    Toast.makeText(requireContext(), "Name, Category ID, Goal required", Toast.LENGTH_SHORT).show()
+                    if (categoryId == null) binding.tilCategory.error = "Select a category"
+                    Toast.makeText(requireContext(), "Name, Category, Goal required", Toast.LENGTH_SHORT).show()
                     return
                 }
                 viewModel.createHabitThenWeekdayRecurringSchedule(
@@ -181,10 +200,18 @@ class CreateScheduleFragment : Fragment() {
             } else {
                 val name = binding.etHabitName.text?.toString()?.trim().orEmpty()
                 val description = binding.etHabitDescription.text?.toString()?.trim()?.ifEmpty { null }
-                val categoryId = binding.etCategoryId.text?.toString()?.toLongOrNull()
                 val goal = binding.etHabitGoal.text?.toString()?.trim().orEmpty()
+                if (selectedCategoryId == null) {
+                    val typed = binding.actCategory.text?.toString()?.trim().orEmpty()
+                    if (typed.isNotEmpty()) {
+                        selectedCategoryId = categories.firstOrNull { it.name == typed }?.id
+                    }
+                }
+
+                val categoryId = selectedCategoryId
                 if (name.isEmpty() || categoryId == null || goal.isEmpty()) {
-                    Toast.makeText(requireContext(), "Name, Category ID, Goal required", Toast.LENGTH_SHORT).show()
+                    if (categoryId == null) binding.tilCategory.error = "Select a category"
+                    Toast.makeText(requireContext(), "Name, Category, Goal required", Toast.LENGTH_SHORT).show()
                     return
                 }
                 viewModel.createHabitThenCustomSchedule(
@@ -298,6 +325,36 @@ class CreateScheduleFragment : Fragment() {
             val names: List<String> = list.map { it.name }
             binding.actHabit.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, names))
         }
+
+        viewModel.categories.observe(viewLifecycleOwner) { list: List<HabitCategory> ->
+            categories = list
+            if (list.isEmpty()) {
+                binding.tilCategory.error = "No categories available"
+            } else {
+                binding.tilCategory.error = null
+            }
+            val adapter = object : ArrayAdapter<HabitCategory>(requireContext(), R.layout.item_category_dropdown, list) {
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_category_dropdown, parent, false)
+                    val item = getItem(position)
+                    val icon: ImageView = v.findViewById(R.id.imgIcon)
+                    val nameTv: TextView = v.findViewById(R.id.tvName)
+                    nameTv.text = item?.name ?: ""
+                    val url = item?.iconUrl
+                    if (!url.isNullOrBlank()) icon.load(url) { crossfade(true) } else icon.setImageResource(android.R.drawable.ic_menu_help)
+                    return v
+                }
+                override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View = getView(position, convertView, parent)
+            }
+            binding.actCategory.setAdapter(adapter)
+            binding.actCategory.onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
+                val item = parent.getItemAtPosition(position) as HabitCategory
+                selectedCategoryId = item.id
+                binding.actCategory.setText(item.name, false)
+                binding.tilCategory.error = null
+            }
+        }
+
         viewModel.createResult.observe(viewLifecycleOwner) { res: Result<Unit> ->
             res.onSuccess {
                 Toast.makeText(requireContext(), "Schedule created", Toast.LENGTH_LONG).show()

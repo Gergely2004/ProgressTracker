@@ -70,15 +70,6 @@ class HomeFragment : Fragment() {
     }
     private fun setupUi() {
 
-        binding.fabProfile.setOnClickListener {
-            try {
-                findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Navigation failed: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-
         binding.fabCreateSchedule.setOnClickListener {
             try {
                 findNavController().navigate(R.id.action_homeFragment_to_createScheduleFragment)

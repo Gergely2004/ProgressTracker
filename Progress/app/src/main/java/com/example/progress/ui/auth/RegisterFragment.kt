@@ -51,11 +51,9 @@ class RegisterFragment : Fragment() {
         viewModel.registerResult.observe(viewLifecycleOwner) { result ->
             Log.d("RegisterFragment", "registerResult: $result")
             result.onSuccess { authResponse ->
-                // Handle successful register (e.g., navigate to login screen)
                 Toast.makeText(requireContext(), "${authResponse.user.name} successfully registered", Toast.LENGTH_LONG).show()
                 findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
             }.onFailure { error ->
-                // Handle register failure
                 Toast.makeText(requireContext(), "Register failed: ${error.message}",
                     Toast.LENGTH_LONG).show()
             }

@@ -6,7 +6,7 @@
              android:layout_height="match_parent"
              tools:context=".ui.auth.LoginFragment">
     <Button
-            android:text="Button"
+            android:text="Login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:id="@+id/btnLogin"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -44,4 +44,20 @@
             android:layout_height="wrap_content" android:id="@+id/textView6"
             app:layout_constraintBottom_toTopOf="@+id/loginPassword" app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.289"/>
+    <TextView
+            android:text="Don't have an account?"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/textView4"
+            app:layout_constraintTop_toBottomOf="@+id/btnLogin" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintBottom_toTopOf="@+id/btnSignIn"
+            app:layout_constraintVertical_bias="0.609" android:layout_marginTop="44dp"
+            app:layout_constraintHorizontal_bias="0.498"/>
+    <Button
+            android:text="Sign Up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/btnSignUp"
+            app:layout_constraintTop_toBottomOf="@+id/textView4"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="0.177"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

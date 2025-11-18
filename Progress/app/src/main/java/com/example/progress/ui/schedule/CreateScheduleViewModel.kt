@@ -11,15 +11,20 @@ import com.example.progress.model.CreateCustomScheduleDto
 import com.example.progress.model.CreateRecurringScheduleDto
 import com.example.progress.model.CreateWeekdayRecurringDto
 import com.example.progress.model.HabitResponseDto
+import com.example.progress.model.HabitCategory
 import com.example.progress.repository.HabitRepository
 import com.example.progress.repository.ScheduleRepository
 import kotlinx.coroutines.launch
 
 class CreateScheduleViewModel(app: Application) : AndroidViewModel(app) {
     private val repo = ScheduleRepository(app)
+    private val habitRepo = HabitRepository(app)
 
     private val _habits = MutableLiveData<List<HabitResponseDto>>()
     val habits: LiveData<List<HabitResponseDto>> = _habits
+
+    private val _categories = MutableLiveData<List<HabitCategory>>()
+    val categories: LiveData<List<HabitCategory>> = _categories
 
     private val _createResult = MutableLiveData<Result<Unit>>()
     val createResult: LiveData<Result<Unit>> = _createResult
@@ -31,6 +36,18 @@ class CreateScheduleViewModel(app: Application) : AndroidViewModel(app) {
             } catch (e: Exception) {
                 Log.e("CreateScheduleVM", "Failed to load habits", e)
                 _habits.postValue(emptyList())
+            }
+        }
+    }
+
+    fun loadCategories() {
+        viewModelScope.launch {
+            try {
+                val list = habitRepo.listHabitCategories()
+                _categories.postValue(list)
+            } catch (e: Exception) {
+                Log.e("CreateScheduleVM", "Failed to load categories", e)
+                _categories.postValue(emptyList())
             }
         }
     }
