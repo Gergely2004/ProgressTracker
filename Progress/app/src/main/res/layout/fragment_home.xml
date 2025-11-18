@@ -5,13 +5,14 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
              tools:context="com.example.progress.ui.home.HomeFragment"
-             android:padding="60dp">
+             android:paddingTop="70dp"
+             android:paddingHorizontal="30dp">
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvSchedules"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="60dp"
+            android:paddingTop="100dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -24,17 +25,6 @@
         app:fabSize="mini"
         android:layout_margin="16dp"
         android:layout_gravity="top|end" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddHabit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/add_habit"
-        android:src="@android:drawable/ic_input_add"
-        app:tint="@android:color/white"
-        app:layout_anchorGravity="bottom|end"
-        android:layout_margin="16dp"
-        android:layout_gravity="bottom|end" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabCreateSchedule"

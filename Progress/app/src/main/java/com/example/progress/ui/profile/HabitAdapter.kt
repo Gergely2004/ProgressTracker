@@ -16,7 +16,6 @@ class HabitAdapter(
             binding.habitGoalTextView.text = "Goal: ${habit.goal}"
             binding.habitDescriptionTextView.text = habit.description ?: "No description"
 
-            // Set category icon if available
             habit.category?.name?.let {
                 binding.habitCategoryIcon.text = getCategoryEmoji(it)
             }

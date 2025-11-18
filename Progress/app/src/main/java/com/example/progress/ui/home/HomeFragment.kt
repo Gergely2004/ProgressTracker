@@ -20,6 +20,7 @@ import com.example.progress.model.ScheduleResponseDto
 import com.example.progress.model.UpdateScheduleDto
 import com.example.progress.repository.ProgressRepository
 import com.example.progress.repository.ScheduleRepository
+import com.example.progress.utils.SessionManager
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -77,13 +78,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        binding.fabAddHabit.setOnClickListener {
-            try {
-                findNavController().navigate(R.id.action_homeFragment_to_addHabitFragment)
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Navigation failed: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
+
         binding.fabCreateSchedule.setOnClickListener {
             try {
                 findNavController().navigate(R.id.action_homeFragment_to_createScheduleFragment)
@@ -100,7 +95,7 @@ class HomeFragment : Fragment() {
                     Toast.makeText(requireContext(), "Navigation failed: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             },
-            onToggleComplete = { sched, markCompleted ->
+            onStatusChange = { sched, newStatus ->
                 if (togglingIds.contains(sched.id)) return@HomeScheduleAdapter
                 togglingIds.add(sched.id)
                 adapter.updateInFlight(togglingIds)
@@ -110,7 +105,6 @@ class HomeFragment : Fragment() {
                 var previousStatus = sched.status
                 if (idx >= 0) {
                     previousStatus = prevList[idx].status
-                    val newStatus = if (markCompleted) "Completed" else "Planned"
                     val updated = prevList[idx].copy(status = newStatus)
                     val newList = prevList.toMutableList().apply { set(idx, updated) }
                     currentSchedules = newList
@@ -119,7 +113,6 @@ class HomeFragment : Fragment() {
 
                 lifecycleScope.launch {
                     try {
-                        val newStatus = if (markCompleted) "Completed" else "Planned"
                         val resp = scheduleRepo.updateSchedule(sched.id, UpdateScheduleDto(status = newStatus))
                         if (!resp.isSuccessful) {
                             if (idx >= 0) {
@@ -129,6 +122,7 @@ class HomeFragment : Fragment() {
                             }
                             Toast.makeText(requireContext(), "Update failed ${resp.code()}", Toast.LENGTH_SHORT).show()
                         } else {
+                            Toast.makeText(requireContext(), "Status updated to $newStatus", Toast.LENGTH_SHORT).show()
                             viewModel.getScheduleByDay(LocalDate.now().toString())
                         }
                     } catch (e: Exception) {
@@ -166,6 +160,24 @@ class HomeFragment : Fragment() {
                 binding.rvSchedules.visibility = View.GONE
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val sessionManager = SessionManager(requireContext())
+
+        if (!sessionManager.isLoggedIn()) {
+            currentSchedules = emptyList()
+            adapter.submitList(emptyList())
+            Toast.makeText(requireContext(), "Please log in", Toast.LENGTH_SHORT).show()
+            try {
+                findNavController().navigate(R.id.loginFragment)
+            } catch (_: Exception) {
+            }
+            return
+        }
+        val today = try { LocalDate.now().toString() } catch (_: Exception) { "2025-10-26" }
+        viewModel.getScheduleByDay(today)
     }
 
     override fun onDestroyView() {

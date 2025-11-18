@@ -95,7 +95,6 @@ class CreateScheduleFragment : Fragment() {
                 Toast.makeText(requireContext(), "Pick recurring start time", Toast.LENGTH_SHORT).show()
                 return
             }
-            // Build start_time using today's date (or next upcoming?) using LocalDate.now
             val today = LocalDate.now()
             val parts = timeText.split(":")
             if (parts.size < 2) {

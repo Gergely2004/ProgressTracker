@@ -91,20 +91,38 @@ class ScheduleDetailsFragment: Fragment() {
             binding.tvHabitName.text = sched.habit?.name ?: "(No habit)"
             binding.tvGoal.text = sched.habit?.goal ?: ""
             binding.tvDescription.text = sched.habit?.description ?: ""
-            binding.tvStatus.text = sched.status ?: "Planned"
+
+            val status = sched.status ?: "Planned"
+            binding.tvStatus.text = status
+
             binding.tvNotes.text = sched.notes ?: ""
             val progresses = sched.progress ?: emptyList()
-            adapter.submitList(progresses.sortedBy { it.date })
-            val total = progresses.size
-            val completed = progresses.count { it.isCompleted }
-            if (total > 0) {
-                val percent = (completed * 100 / total)
-                binding.progressBar.progress = percent
-                binding.tvProgressPercent.text = String.format(Locale.getDefault(), "%d%%", percent)
-            } else {
-                binding.progressBar.progress = if (sched.status?.equals("completed", true) == true) 100 else 0
-                binding.tvProgressPercent.text = if (sched.status?.equals("completed", true) == true) "100%" else "0%"
+            adapter.submitList(progresses.sortedByDescending { it.date })
+
+            val progressPercent = when (status.lowercase()) {
+                "completed" -> 100
+                "skipped" -> 0
+                else -> {
+                    val durationMinutes = sched.durationMinutes
+                    if (durationMinutes != null && durationMinutes > 0) {
+                        val totalLoggedTime = progresses.sumOf { it.loggedTime }
+                        val percent = ((totalLoggedTime / durationMinutes) * 100).toInt()
+                        percent.coerceIn(0, 100)
+                    } else {
+                        val total = progresses.size
+                        if (total > 0) {
+                            val completed = progresses.count { it.isCompleted }
+                            (completed * 100 / total)
+                        } else {
+                            0
+                        }
+                    }
+                }
             }
+
+            binding.progressBar.progress = progressPercent
+            binding.tvProgressPercent.text = String.format(Locale.getDefault(), "%d%%", progressPercent)
+
             binding.groupNotes.visibility = View.VISIBLE
         }
 

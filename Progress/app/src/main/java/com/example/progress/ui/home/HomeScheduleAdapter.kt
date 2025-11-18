@@ -1,6 +1,5 @@
 package com.example.progress.ui.home
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -9,13 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.progress.databinding.ItemHomeScheduleBinding
 import com.example.progress.model.ScheduleResponseDto
 import androidx.core.view.isVisible
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import com.google.android.material.checkbox.MaterialCheckBox
 
 class HomeScheduleAdapter(
     private val onItemClick: (ScheduleResponseDto) -> Unit,
-    private val onToggleComplete: (ScheduleResponseDto, Boolean) -> Unit
+    private val onStatusChange: (ScheduleResponseDto, String) -> Unit
 ) : ListAdapter<ScheduleResponseDto, HomeScheduleAdapter.ViewHolder> (DiffCallback()) {
 
     private var inFlight: Set<Long> = emptySet()
@@ -33,7 +29,7 @@ class HomeScheduleAdapter(
         val item = getItem(position)
         holder.bind(item)
         holder.itemView.setOnClickListener { onItemClick(item) }
-        holder.bindToggle(item, onToggleComplete)
+        holder.bindStatusButtons(item, onStatusChange)
         holder.setEnabled(!inFlight.contains(item.id))
     }
 
@@ -42,6 +38,12 @@ class HomeScheduleAdapter(
             val timeText = item.startTime?.toLocalTime()?.toString() ?: "--:--"
             binding.tvTime.text = timeText
             binding.tvTitle.text = item.habit?.name ?: "Unknown Habit"
+
+            item.habit?.category?.name?.let { categoryName ->
+                binding.tvCategoryIcon.text = getCategoryEmoji(categoryName)
+            } ?: run {
+                binding.tvCategoryIcon.text = "✓"
+            }
 
             val status = item.status ?: "Planned"
             binding.tvStatus.text = when (status.lowercase()) {
@@ -58,16 +60,45 @@ class HomeScheduleAdapter(
 
             binding.tvNotes.text = item.notes ?: ""
             binding.tvNotes.isVisible = !item.notes.isNullOrEmpty()
-
-            binding.cbDone.setOnCheckedChangeListener(null)
-            binding.cbDone.isChecked = status.equals("completed", ignoreCase = true)
+            updateButtonStates(status)
         }
-        fun bindToggle(item: ScheduleResponseDto, onToggle: (ScheduleResponseDto, Boolean) -> Unit) {
-            binding.cbDone.setOnCheckedChangeListener { _, isChecked ->
-                onToggle(item, isChecked)
+
+        private fun updateButtonStates(status: String) {
+            val isCompleted = status.equals("completed", ignoreCase = true)
+            val isSkipped = status.equals("skipped", ignoreCase = true)
+            val isPlanned = !isCompleted && !isSkipped
+
+            binding.btnComplete.strokeWidth = if (isCompleted) 4 else 2
+            binding.btnSkip.strokeWidth = if (isSkipped) 4 else 2
+            binding.btnReset.strokeWidth = if (isPlanned) 4 else 2
+            binding.btnComplete.isEnabled = !isCompleted
+            binding.btnSkip.isEnabled = !isSkipped
+            binding.btnReset.isEnabled = !isPlanned
+        }
+
+        fun bindStatusButtons(item: ScheduleResponseDto, onStatusChange: (ScheduleResponseDto, String) -> Unit) {
+            binding.btnComplete.setOnClickListener { onStatusChange(item, "Completed") }
+            binding.btnSkip.setOnClickListener { onStatusChange(item, "Skipped") }
+            binding.btnReset.setOnClickListener { onStatusChange(item, "Planned") }
+        }
+
+        fun setEnabled(enabled: Boolean) {
+            binding.statusActions.alpha = if (enabled) 1.0f else 0.5f
+            binding.btnComplete.isClickable = enabled
+            binding.btnSkip.isClickable = enabled
+            binding.btnReset.isClickable = enabled
+        }
+
+        private fun getCategoryEmoji(categoryName: String): String {
+            return when (categoryName.lowercase()) {
+                "exercise", "fitness" -> "💪"
+                "reading", "study" -> "📖"
+                "health", "wellness" -> "🏥"
+                "work" -> "💼"
+                "personal" -> "👤"
+                else -> "?"
             }
         }
-        fun setEnabled(enabled: Boolean) { binding.cbDone.isEnabled = enabled }
     }
 
     class DiffCallback : DiffUtil.ItemCallback<ScheduleResponseDto>() {

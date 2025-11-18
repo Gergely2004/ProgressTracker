@@ -15,7 +15,11 @@ class SessionManager(context: Context) {
         return prefs.getString(KEY_AUTH_TOKEN, null)
     }
     fun clearAuthToken() {
-        prefs.edit().remove(KEY_AUTH_TOKEN).apply()
+        prefs.edit().clear().apply()
+    }
+
+    fun isLoggedIn(): Boolean {
+        return !fetchAuthToken().isNullOrEmpty()
     }
 }
 

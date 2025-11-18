@@ -1,7 +1,6 @@
 package com.example.progress.ui.profile
 
 import android.app.AlertDialog
-import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
@@ -15,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.progress.R
 import com.example.progress.databinding.FragmentProfileBinding
+import com.example.progress.utils.SessionManager
 import coil.load
 import coil.transform.CircleCropTransformation
 import java.text.SimpleDateFormat
@@ -151,14 +151,21 @@ class ProfileFragment : Fragment() {
     }
 
     private fun performLogout() {
-        val sharedPreferences = requireContext().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit().remove("access_token").apply()
-
+        val sessionManager = SessionManager(requireContext())
+        sessionManager.clearAuthToken()
+        viewModel.clearData()
         findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
+        Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {
         super.onResume()
+        val sessionManager = SessionManager(requireContext())
+
+        if (!sessionManager.isLoggedIn()) {
+            findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
+            return
+        }
         if (viewModel.profile.value == null) {
             viewModel.loadProfile()
         } else {

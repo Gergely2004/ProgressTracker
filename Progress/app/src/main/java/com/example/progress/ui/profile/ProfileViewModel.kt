@@ -69,7 +69,15 @@ class ProfileViewModel(app: Application) : AndroidViewModel(app) {
         _profile.value?.id?.let { loadHabitsByUser(it) }
     }
 
+    fun clearData() {
+        _profile.value = null
+        _habits.value = emptyList()
+        _error.value = null
+        _isLoading.value = false
+    }
+
     @Suppress("unused")
     fun logout() {
+        clearData()
     }
 }
